@@ -1,0 +1,340 @@
+{
+    "____comment": "This file was generated with eosio-abigen. DO NOT EDIT ",
+    "version": "eosio::abi/1.2",
+    "types": [],
+    "structs": [
+        {
+            "name": "bind",
+            "base": "",
+            "fields": [
+                {
+                    "name": "owner",
+                    "type": "name"
+                },
+                {
+                    "name": "drops_ids",
+                    "type": "uint64[]"
+                }
+            ]
+        },
+        {
+            "name": "bind_return_value",
+            "base": "",
+            "fields": [
+                {
+                    "name": "ram_sold",
+                    "type": "uint64"
+                },
+                {
+                    "name": "redeemed",
+                    "type": "asset"
+                }
+            ]
+        },
+        {
+            "name": "cancelunbind",
+            "base": "",
+            "fields": [
+                {
+                    "name": "owner",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "cleartable",
+            "base": "",
+            "fields": [
+                {
+                    "name": "table_name",
+                    "type": "name"
+                },
+                {
+                    "name": "scope",
+                    "type": "name?"
+                },
+                {
+                    "name": "max_rows",
+                    "type": "uint64?"
+                }
+            ]
+        },
+        {
+            "name": "destroy",
+            "base": "",
+            "fields": [
+                {
+                    "name": "owner",
+                    "type": "name"
+                },
+                {
+                    "name": "drops_ids",
+                    "type": "uint64[]"
+                },
+                {
+                    "name": "memo",
+                    "type": "string"
+                }
+            ]
+        },
+        {
+            "name": "destroy_return_value",
+            "base": "",
+            "fields": [
+                {
+                    "name": "ram_sold",
+                    "type": "uint64"
+                },
+                {
+                    "name": "redeemed",
+                    "type": "asset"
+                },
+                {
+                    "name": "ram_reclaimed",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "drop_row",
+            "base": "",
+            "fields": [
+                {
+                    "name": "seed",
+                    "type": "uint64"
+                },
+                {
+                    "name": "owner",
+                    "type": "name"
+                },
+                {
+                    "name": "created",
+                    "type": "block_timestamp_type"
+                },
+                {
+                    "name": "bound",
+                    "type": "bool"
+                }
+            ]
+        },
+        {
+            "name": "enable",
+            "base": "",
+            "fields": [
+                {
+                    "name": "enabled",
+                    "type": "bool"
+                }
+            ]
+        },
+        {
+            "name": "generate_return_value",
+            "base": "",
+            "fields": [
+                {
+                    "name": "drops",
+                    "type": "uint32"
+                },
+                {
+                    "name": "cost",
+                    "type": "asset"
+                },
+                {
+                    "name": "refund",
+                    "type": "asset"
+                },
+                {
+                    "name": "total_drops",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "mint",
+            "base": "",
+            "fields": [
+                {
+                    "name": "owner",
+                    "type": "name"
+                },
+                {
+                    "name": "amount",
+                    "type": "uint32"
+                },
+                {
+                    "name": "data",
+                    "type": "string"
+                }
+            ]
+        },
+        {
+            "name": "state_row",
+            "base": "",
+            "fields": [
+                {
+                    "name": "genesis",
+                    "type": "block_timestamp_type"
+                },
+                {
+                    "name": "bytes_per_drop",
+                    "type": "int64"
+                },
+                {
+                    "name": "enabled",
+                    "type": "bool"
+                }
+            ]
+        },
+        {
+            "name": "test",
+            "base": "",
+            "fields": [
+                {
+                    "name": "data",
+                    "type": "string"
+                }
+            ]
+        },
+        {
+            "name": "transfer",
+            "base": "",
+            "fields": [
+                {
+                    "name": "from",
+                    "type": "name"
+                },
+                {
+                    "name": "to",
+                    "type": "name"
+                },
+                {
+                    "name": "drops_ids",
+                    "type": "uint64[]"
+                },
+                {
+                    "name": "memo",
+                    "type": "string"
+                }
+            ]
+        },
+        {
+            "name": "unbind",
+            "base": "",
+            "fields": [
+                {
+                    "name": "owner",
+                    "type": "name"
+                },
+                {
+                    "name": "drops_ids",
+                    "type": "uint64[]"
+                }
+            ]
+        },
+        {
+            "name": "unbind_row",
+            "base": "",
+            "fields": [
+                {
+                    "name": "owner",
+                    "type": "name"
+                },
+                {
+                    "name": "drops_ids",
+                    "type": "uint64[]"
+                }
+            ]
+        }
+    ],
+    "actions": [
+        {
+            "name": "bind",
+            "type": "bind",
+            "ricardian_contract": "---\n\nspec_version: \"0.2.0\"\ntitle: bind\nsummary: bind\nicon: https://avatars.githubusercontent.com/u/158113782#d3bf290fddeddbb7d32aa897e9f7e9e13a2ae44956142e23eb47b77096a2ea8d\n\n---"
+        },
+        {
+            "name": "cancelunbind",
+            "type": "cancelunbind",
+            "ricardian_contract": "---\n\nspec_version: \"0.2.0\"\ntitle: cancelunbind\nsummary: cancelunbind\nicon: https://avatars.githubusercontent.com/u/158113782#d3bf290fddeddbb7d32aa897e9f7e9e13a2ae44956142e23eb47b77096a2ea8d\n\n---"
+        },
+        {
+            "name": "cleartable",
+            "type": "cleartable",
+            "ricardian_contract": "---\n\nspec_version: \"0.2.0\"\ntitle: cleartable\nsummary: cleartable\nicon: https://avatars.githubusercontent.com/u/158113782#d3bf290fddeddbb7d32aa897e9f7e9e13a2ae44956142e23eb47b77096a2ea8d\n\n---"
+        },
+        {
+            "name": "destroy",
+            "type": "destroy",
+            "ricardian_contract": "---\n\nspec_version: \"0.2.0\"\ntitle: destroy\nsummary: destroy\nicon: https://avatars.githubusercontent.com/u/158113782#d3bf290fddeddbb7d32aa897e9f7e9e13a2ae44956142e23eb47b77096a2ea8d\n\n---"
+        },
+        {
+            "name": "enable",
+            "type": "enable",
+            "ricardian_contract": "---\n\nspec_version: \"0.2.0\"\ntitle: enable\nsummary: enable\nicon: https://avatars.githubusercontent.com/u/158113782#d3bf290fddeddbb7d32aa897e9f7e9e13a2ae44956142e23eb47b77096a2ea8d\n\n---"
+        },
+        {
+            "name": "mint",
+            "type": "mint",
+            "ricardian_contract": "---\n\nspec_version: \"0.2.0\"\ntitle: mint\nsummary: mint\nicon: https://avatars.githubusercontent.com/u/158113782#d3bf290fddeddbb7d32aa897e9f7e9e13a2ae44956142e23eb47b77096a2ea8d\n\n---"
+        },
+        {
+            "name": "test",
+            "type": "test",
+            "ricardian_contract": "---\n\nspec_version: \"0.2.0\"\ntitle: test\nsummary: test\nicon: https://avatars.githubusercontent.com/u/158113782#d3bf290fddeddbb7d32aa897e9f7e9e13a2ae44956142e23eb47b77096a2ea8d\n\n---"
+        },
+        {
+            "name": "transfer",
+            "type": "transfer",
+            "ricardian_contract": "---\n\nspec_version: \"0.2.0\"\ntitle: transfer\nsummary: transfer\nicon: https://avatars.githubusercontent.com/u/158113782#d3bf290fddeddbb7d32aa897e9f7e9e13a2ae44956142e23eb47b77096a2ea8d\n\n---"
+        },
+        {
+            "name": "unbind",
+            "type": "unbind",
+            "ricardian_contract": "---\n\nspec_version: \"0.2.0\"\ntitle: unbind\nsummary: unbind\nicon: https://avatars.githubusercontent.com/u/158113782#d3bf290fddeddbb7d32aa897e9f7e9e13a2ae44956142e23eb47b77096a2ea8d\n\n---"
+        }
+    ],
+    "tables": [
+        {
+            "name": "drop",
+            "type": "drop_row",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": []
+        },
+        {
+            "name": "state",
+            "type": "state_row",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": []
+        },
+        {
+            "name": "unbind",
+            "type": "unbind_row",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": []
+        }
+    ],
+    "ricardian_clauses": [
+        {
+            "id": "Drops",
+            "body": "Drops"
+        }
+    ],
+    "variants": [],
+    "action_results": [
+        {
+            "name": "bind",
+            "result_type": "bind_return_value"
+        },
+        {
+            "name": "destroy",
+            "result_type": "destroy_return_value"
+        },
+        {
+            "name": "mint",
+            "result_type": "generate_return_value"
+        }
+    ]
+}
