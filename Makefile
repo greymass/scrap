@@ -60,38 +60,16 @@ distclean: clean
 
 .PHONY: dev/enable
 dev/enable:
-	cleos -u $(DEVNET_NODE_URL) push action $(DEVNET_ACCOUNT_NAME) enable '{"enabled": true}' -p $(DEVNET_ACCOUNT_NAME)@active
-
-# .PHONY: dev/wipe
-# dev/wipe:
-# 	cleos -u $(DEVNET_NODE_URL) push action $(DEVNET_ACCOUNT_NAME) cleartable '{"table_name": "balances"}' -p $(DEVNET_ACCOUNT_NAME)@active
-# 	cleos -u $(DEVNET_NODE_URL) push action $(DEVNET_ACCOUNT_NAME) cleartable '{"table_name": "drop"}' -p $(DEVNET_ACCOUNT_NAME)@active
-# 	cleos -u $(DEVNET_NODE_URL) push action $(DEVNET_ACCOUNT_NAME) cleartable '{"table_name": "state"}' -p $(DEVNET_ACCOUNT_NAME)@active
+	cleos -u $(DEVNET_NODE_URL) push action $(DEVNET_ACCOUNT_NAME) create '{"issuer": "scrap.gm", "maximum_supply": "1000000000 SCRAP"}' -p $(DEVNET_ACCOUNT_NAME)@active
 
 .PHONY: testnet/enable
 testnet/enable:
-	cleos -u $(TESTNET_NODE_URL) push action $(TESTNET_ACCOUNT_NAME) enable '{"enabled": true}' -p $(TESTNET_ACCOUNT_NAME)@active
+	cleos -u $(TESTNET_NODE_URL) push action $(TESTNET_ACCOUNT_NAME) create '{"issuer": "scrap.gm", "maximum_supply": "1000000000 SCRAP"}' -p $(TESTNET_ACCOUNT_NAME)@active
 
-.PHONY: testnet/wipe
-testnet/wipe:
-	cleos -u $(TESTNET_NODE_URL) push action $(TESTNET_ACCOUNT_NAME) cleartable '{"table_name": "commit"}' -p $(TESTNET_ACCOUNT_NAME)@active
-	cleos -u $(TESTNET_NODE_URL) push action $(TESTNET_ACCOUNT_NAME) cleartable '{"table_name": "epoch"}' -p $(TESTNET_ACCOUNT_NAME)@active
-	cleos -u $(TESTNET_NODE_URL) push action $(TESTNET_ACCOUNT_NAME) cleartable '{"table_name": "oracle"}' -p $(TESTNET_ACCOUNT_NAME)@active
-	cleos -u $(TESTNET_NODE_URL) push action $(TESTNET_ACCOUNT_NAME) cleartable '{"table_name": "reveal"}' -p $(TESTNET_ACCOUNT_NAME)@active
-	cleos -u $(TESTNET_NODE_URL) push action $(TESTNET_ACCOUNT_NAME) cleartable '{"table_name": "state"}' -p $(TESTNET_ACCOUNT_NAME)@active
-# cleos -u $(TESTNET_NODE_URL) push action $(TESTNET_ACCOUNT_NAME) cleartable '{"table_name": "subscriber"}' -p $(TESTNET_ACCOUNT_NAME)@active
+.PHONY: testnet/destroy
+testnet/destroy:
+	cleos -u $(TESTNET_NODE_URL) push action $(TESTNET_ACCOUNT_NAME) destroy '{"issuer": "scrap.gm", "maximum_supply": "1000000000 SCRAP"}' -p $(TESTNET_ACCOUNT_NAME)@active
 
-.PHONY: testnet/oracles
-testnet/oracles:
-	cleos -u $(TESTNET_NODE_URL) push action $(TESTNET_ACCOUNT_NAME) addoracle '{"oracle": "oracle1.gm"}' -p $(TESTNET_ACCOUNT_NAME)@active
-	cleos -u $(TESTNET_NODE_URL) push action $(TESTNET_ACCOUNT_NAME) addoracle '{"oracle": "oracle2.gm"}' -p $(TESTNET_ACCOUNT_NAME)@active
-	cleos -u $(TESTNET_NODE_URL) push action $(TESTNET_ACCOUNT_NAME) addoracle '{"oracle": "oracle3.gm"}' -p $(TESTNET_ACCOUNT_NAME)@active
-
-.PHONY: testnet/init
-testnet/init:
-	cleos -u $(TESTNET_NODE_URL) push action $(TESTNET_ACCOUNT_NAME) init '{}' -p $(TESTNET_ACCOUNT_NAME)@active
-
-.PHONY: testnet/initfast
-testnet/initfast:
-	cleos -u $(TESTNET_NODE_URL) push action $(TESTNET_ACCOUNT_NAME) duration '{"duration": 60}' -p $(TESTNET_ACCOUNT_NAME)@active
-	cleos -u $(TESTNET_NODE_URL) push action $(TESTNET_ACCOUNT_NAME) init '{}' -p $(TESTNET_ACCOUNT_NAME)@active
+.PHONY: mainnet/enable
+mainnet/enable:
+	cleos -u $(MAINNET_NODE_URL) push action $(MAINNET_ACCOUNT_NAME) create '{"issuer": "scrap", "maximum_supply": "1000000000 SCRAP"}' -p $(MAINNET_ACCOUNT_NAME)@active

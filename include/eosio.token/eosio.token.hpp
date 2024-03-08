@@ -44,9 +44,16 @@ class [[eosio::contract("eosio.token")]] token : public contract
 public:
    using contract::contract;
 
+   // The token symbol for SCRAP
+   const symbol SCRAP_SYMBOL = symbol{"SCRAP", 0};
+
+   // The mining difficult of the hash hex value (number of leading zeros)
+   // 2 difficulty = 16 * 16 = 1:256 odds
+   const uint32_t SCRAP_MINING_DIFFICULTY = 2;
+
    /**
-    * Allows `issuer` account to create a token in supply of `maximum_supply`. If validation is successful a new entry
-    * in statstable for token symbol scope gets created.
+    * Allows `issuer` account to create a token in supply of `maximum_supply`. If validation is successful a new
+    * entry in statstable for token symbol scope gets created.
     *
     * @param issuer - the account that creates the token,
     * @param maximum_supply - the maximum supply set for the token created.
@@ -59,15 +66,15 @@ public:
    [[eosio::action]] void create(const name& issuer, const asset& maximum_supply);
 
    /**
-    * This action mints tokens to the `owner` account provided the `drops_ids` destroyed and `memo` meet the criteria of
-    * minting.
+    * This action mint new tokens to the `owner` account, provided the `droplet_ids` destroyed are valid and `memo` meet
+    * the criteria of minting.
     *
     * @param owner - the account that creates the token,
     * @param drops - the maximum supply set for the token created.
     * @param memo - the memo string to accompany the transaction.
     */
    [[eosio::on_notify("drops::logdestroy")]] void mint(const name                                 owner,
-                                                       const vector<dropssystem::drops::drop_row> drops,
+                                                       const vector<dropssystem::drops::drop_row> droplet_ids,
                                                        const int64_t                              destroyed,
                                                        const int64_t                              unbound_destroyed,
                                                        const int64_t                              bytes_reclaimed,
@@ -145,6 +152,13 @@ public:
     */
    [[eosio::action]] void close(const name& owner, const symbol& symbol);
 
+#ifdef DEBUG
+   /**
+    * FOR DEBUGGING: This action will destroy all balances and reset the contract.
+    */
+   [[eosio::action]] void destroy(const name& issuer, const asset& maximum_supply);
+#endif
+
    static asset get_supply(const name& token_contract_account, const symbol_code& sym_code)
    {
       stats       statstable(token_contract_account, sym_code.raw());
@@ -187,8 +201,9 @@ private:
    typedef eosio::multi_index<"accounts"_n, account>    accounts;
    typedef eosio::multi_index<"stat"_n, currency_stats> stats;
 
-   void sub_balance(const name& owner, const asset& value);
-   void add_balance(const name& owner, const asset& value, const name& ram_payer);
+   void     sub_balance(const name& owner, const asset& value);
+   void     add_balance(const name& owner, const asset& value, const name& ram_payer);
+   uint64_t get_mint_amount(const uint64_t current_supply);
 };
 
 } // namespace eosio

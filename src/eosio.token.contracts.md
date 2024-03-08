@@ -93,3 +93,12 @@ icon: @ICON_BASE_URL@/@TRANSFER_ICON_URI@
 If {{from}} is not already the RAM payer of their {{asset_to_symbol_code quantity}} token balance, {{from}} will be designated as such. As a result, RAM will be deducted from {{from}}’s resources to refund the original RAM payer.
 
 If {{to}} does not have a balance for {{asset_to_symbol_code quantity}}, {{from}} will be designated as the RAM payer of the {{asset_to_symbol_code quantity}} token balance for {{to}}. As a result, RAM will be deducted from {{from}}’s resources to create the necessary records.
+
+<h1 class="contract">logmint</h1>
+
+---
+spec_version: "0.2.0"
+title: logmint
+summary: logmint
+icon: @ICON_BASE_URL@/@TRANSFER_ICON_URI@
+---
