@@ -14,6 +14,34 @@
             ]
         },
         {
+            "name": "approval_row",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account",
+                    "type": "name"
+                },
+                {
+                    "name": "snapshot",
+                    "type": "asset"
+                },
+                {
+                    "name": "snapped",
+                    "type": "bool"
+                }
+            ]
+        },
+        {
+            "name": "approve",
+            "base": "",
+            "fields": [
+                {
+                    "name": "holder",
+                    "type": "name"
+                }
+            ]
+        },
+        {
             "name": "close",
             "base": "",
             "fields": [
@@ -24,6 +52,42 @@
                 {
                     "name": "symbol",
                     "type": "symbol"
+                }
+            ]
+        },
+        {
+            "name": "closevote",
+            "base": "",
+            "fields": [
+                {
+                    "name": "max_rows",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "config_row",
+            "base": "",
+            "fields": [
+                {
+                    "name": "eon",
+                    "type": "name"
+                },
+                {
+                    "name": "nex",
+                    "type": "name"
+                },
+                {
+                    "name": "epoch_start",
+                    "type": "time_point_sec"
+                },
+                {
+                    "name": "epoch_seconds",
+                    "type": "uint32"
+                },
+                {
+                    "name": "notice_epochs",
+                    "type": "uint32"
                 }
             ]
         },
@@ -56,6 +120,32 @@
                 {
                     "name": "issuer",
                     "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "init",
+            "base": "",
+            "fields": [
+                {
+                    "name": "eon",
+                    "type": "name"
+                },
+                {
+                    "name": "nex",
+                    "type": "name"
+                },
+                {
+                    "name": "epoch_start",
+                    "type": "time_point_sec"
+                },
+                {
+                    "name": "epoch_seconds",
+                    "type": "uint32"
+                },
+                {
+                    "name": "notice_epochs",
+                    "type": "uint32"
                 }
             ]
         },
@@ -100,6 +190,46 @@
                 {
                     "name": "results",
                     "type": "mint_result[]"
+                }
+            ]
+        },
+        {
+            "name": "logratify",
+            "base": "",
+            "fields": [
+                {
+                    "name": "tally",
+                    "type": "asset"
+                },
+                {
+                    "name": "supply",
+                    "type": "asset"
+                },
+                {
+                    "name": "ratified_epoch",
+                    "type": "uint32"
+                },
+                {
+                    "name": "start_epoch",
+                    "type": "uint32"
+                },
+                {
+                    "name": "start_time",
+                    "type": "time_point_sec"
+                }
+            ]
+        },
+        {
+            "name": "logsupport",
+            "base": "",
+            "fields": [
+                {
+                    "name": "supporters",
+                    "type": "support[]"
+                },
+                {
+                    "name": "closed",
+                    "type": "bool"
                 }
             ]
         },
@@ -150,6 +280,20 @@
             ]
         },
         {
+            "name": "support",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account",
+                    "type": "name"
+                },
+                {
+                    "name": "weight",
+                    "type": "asset"
+                }
+            ]
+        },
+        {
             "name": "transfer",
             "base": "",
             "fields": [
@@ -170,18 +314,77 @@
                     "type": "string"
                 }
             ]
+        },
+        {
+            "name": "vote_row",
+            "base": "",
+            "fields": [
+                {
+                    "name": "tally",
+                    "type": "asset"
+                },
+                {
+                    "name": "ratified",
+                    "type": "bool"
+                },
+                {
+                    "name": "closed",
+                    "type": "bool"
+                },
+                {
+                    "name": "supply",
+                    "type": "asset"
+                },
+                {
+                    "name": "ratified_epoch",
+                    "type": "uint32"
+                },
+                {
+                    "name": "start_epoch",
+                    "type": "uint32"
+                },
+                {
+                    "name": "start_time",
+                    "type": "time_point_sec"
+                }
+            ]
+        },
+        {
+            "name": "withdraw",
+            "base": "",
+            "fields": [
+                {
+                    "name": "holder",
+                    "type": "name"
+                }
+            ]
         }
     ],
     "actions": [
+        {
+            "name": "approve",
+            "type": "approve",
+            "ricardian_contract": ""
+        },
         {
             "name": "close",
             "type": "close",
             "ricardian_contract": "---\nspec_version: \"0.2.0\"\ntitle: Close Token Balance\nsummary: 'Close {{nowrap owner}}’s zero quantity balance'\nicon: @ICON_BASE_URL@/@TOKEN_ICON_URI@\n---\n\n{{owner}} agrees to close their zero quantity balance for the {{symbol_to_symbol_code symbol}} token.\n\nRAM will be refunded to the RAM payer of the {{symbol_to_symbol_code symbol}} token balance for {{owner}}."
         },
         {
+            "name": "closevote",
+            "type": "closevote",
+            "ricardian_contract": ""
+        },
+        {
             "name": "create",
             "type": "create",
             "ricardian_contract": "---\nspec_version: \"0.2.0\"\ntitle: Create New Token\nsummary: 'Create a new token'\nicon: @ICON_BASE_URL@/@TOKEN_ICON_URI@\n---\n\n{{$action.account}} agrees to create a new token with symbol {{asset_to_symbol_code maximum_supply}} to be managed by {{issuer}}.\n\nThis action will not result any any tokens being issued into circulation.\n\n{{issuer}} will be allowed to issue tokens into circulation, up to a maximum supply of {{maximum_supply}}.\n\nRAM will deducted from {{$action.account}}’s resources to create the necessary records."
+        },
+        {
+            "name": "init",
+            "type": "init",
+            "ricardian_contract": ""
         },
         {
             "name": "issue",
@@ -192,6 +395,16 @@
             "name": "logmint",
             "type": "logmint",
             "ricardian_contract": "---\nspec_version: \"0.2.0\"\ntitle: logmint\nsummary: logmint\nicon: @ICON_BASE_URL@/@TRANSFER_ICON_URI@\n---"
+        },
+        {
+            "name": "logratify",
+            "type": "logratify",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "logsupport",
+            "type": "logsupport",
+            "ricardian_contract": ""
         },
         {
             "name": "open",
@@ -207,6 +420,11 @@
             "name": "transfer",
             "type": "transfer",
             "ricardian_contract": "---\nspec_version: \"0.2.0\"\ntitle: Transfer Tokens\nsummary: 'Send {{nowrap quantity}} from {{nowrap from}} to {{nowrap to}}'\nicon: @ICON_BASE_URL@/@TRANSFER_ICON_URI@\n---\n\n{{from}} agrees to send {{quantity}} to {{to}}.\n\n{{#if memo}}There is a memo attached to the transfer stating:\n{{memo}}\n{{/if}}\n\nIf {{from}} is not already the RAM payer of their {{asset_to_symbol_code quantity}} token balance, {{from}} will be designated as such. As a result, RAM will be deducted from {{from}}’s resources to refund the original RAM payer.\n\nIf {{to}} does not have a balance for {{asset_to_symbol_code quantity}}, {{from}} will be designated as the RAM payer of the {{asset_to_symbol_code quantity}} token balance for {{to}}. As a result, RAM will be deducted from {{from}}’s resources to create the necessary records."
+        },
+        {
+            "name": "withdraw",
+            "type": "withdraw",
+            "ricardian_contract": ""
         }
     ],
     "tables": [
@@ -218,8 +436,29 @@
             "key_types": []
         },
         {
+            "name": "approvals",
+            "type": "approval_row",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": []
+        },
+        {
+            "name": "config",
+            "type": "config_row",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": []
+        },
+        {
             "name": "stat",
             "type": "currency_stats",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": []
+        },
+        {
+            "name": "vote",
+            "type": "vote_row",
             "index_type": "i64",
             "key_names": [],
             "key_types": []

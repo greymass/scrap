@@ -52,6 +52,10 @@ void token::destroy(const name& issuer, const asset& maximum_supply)
                                                            optional<string>                           memo,
                                                            optional<name>                             to_notify)
 {
+   if (handover_started()) {
+      return;
+   }
+
    const dropssystem::epoch::epoch_table _epoch("epoch.drops"_n, "epoch.drops"_n.value);
    dropssystem::epoch::state_table       _state("epoch.drops"_n, "epoch.drops"_n.value);
 
@@ -122,10 +126,12 @@ void token::destroy(const name& issuer, const asset& maximum_supply)
    asset quantity = asset(amount, SCRAP_SYMBOL);
    statstable.modify(st, get_self(), [&](auto& s) { s.supply += quantity; });
 
-   add_balance(owner, quantity, get_self());
+   const int64_t before = add_balance(owner, quantity, get_self());
 
    token::logmint_action logmint{get_self(), {get_self(), "active"_n}};
    logmint.send(owner, quantity, epoch_previous, epoch->seed, results);
+
+   track_vote({{owner, before, before + quantity.amount}}, true);
 }
 
 uint64_t token::get_mint_amount(const uint64_t current_supply)
@@ -189,7 +195,8 @@ void token::issue(const name& to, const asset& quantity, const string& memo)
 
    statstable.modify(st, same_payer, [&](auto& s) { s.supply += quantity; });
 
-   add_balance(st.issuer, quantity, st.issuer);
+   const int64_t before = add_balance(st.issuer, quantity, st.issuer);
+   track_vote({{st.issuer, before, before + quantity.amount}}, true);
 }
 
 void token::retire(const asset& quantity, const string& memo)
@@ -211,7 +218,8 @@ void token::retire(const asset& quantity, const string& memo)
 
    statstable.modify(st, same_payer, [&](auto& s) { s.supply -= quantity; });
 
-   sub_balance(st.issuer, quantity);
+   const int64_t before = sub_balance(st.issuer, quantity);
+   track_vote({{st.issuer, before, before - quantity.amount}}, true);
 }
 
 void token::transfer(const name& from, const name& to, const asset& quantity, const string& memo)
@@ -233,29 +241,35 @@ void token::transfer(const name& from, const name& to, const asset& quantity, co
 
    auto payer = has_auth(to) ? to : from;
 
-   sub_balance(from, quantity);
-   add_balance(to, quantity, payer);
+   const int64_t from_before = sub_balance(from, quantity);
+   const int64_t to_before   = add_balance(to, quantity, payer);
+   track_vote({{from, from_before, from_before - quantity.amount}, {to, to_before, to_before + quantity.amount}},
+              false);
 }
 
-void token::sub_balance(const name& owner, const asset& value)
+int64_t token::sub_balance(const name& owner, const asset& value)
 {
    accounts from_acnts(get_self(), owner.value);
 
    const auto& from = from_acnts.get(value.symbol.code().raw(), "no balance object found");
    check(from.balance.amount >= value.amount, "overdrawn balance");
 
+   const int64_t before = from.balance.amount;
    from_acnts.modify(from, owner, [&](auto& a) { a.balance -= value; });
+   return before;
 }
 
-void token::add_balance(const name& owner, const asset& value, const name& ram_payer)
+int64_t token::add_balance(const name& owner, const asset& value, const name& ram_payer)
 {
    accounts to_acnts(get_self(), owner.value);
    auto     to = to_acnts.find(value.symbol.code().raw());
    if (to == to_acnts.end()) {
       to_acnts.emplace(ram_payer, [&](auto& a) { a.balance = value; });
-   } else {
-      to_acnts.modify(to, same_payer, [&](auto& a) { a.balance += value; });
+      return 0;
    }
+   const int64_t before = to->balance.amount;
+   to_acnts.modify(to, same_payer, [&](auto& a) { a.balance += value; });
+   return before;
 }
 
 void token::open(const name& owner, const symbol& symbol, const name& ram_payer)
@@ -287,3 +301,5 @@ void token::close(const name& owner, const symbol& symbol)
 }
 
 } // namespace eosio
+
+#include "vote.cpp"

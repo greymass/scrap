@@ -54,6 +54,14 @@ format: cppformat
 cppformat:
 	clang-format -i src/*.cpp include/${CONTRACT_NAME}/*.hpp
 
+.PHONY: test
+test: build/production node_modules
+	bun test test/
+
+node_modules: package.json
+	bun install
+	@touch node_modules
+
 .PHONY: distclean
 distclean: clean
 	rm -rf node_modules/
