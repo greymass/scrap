@@ -191,7 +191,8 @@ void token::issue(const name& to, const asset& quantity, const string& memo)
    check(quantity.amount > 0, "must issue positive quantity");
 
    check(quantity.symbol == st.supply.symbol, "symbol precision mismatch");
-   check(quantity.amount <= st.max_supply.amount - st.supply.amount, "quantity exceeds available supply");
+   check(quantity.amount <= st.max_supply.amount - st.supply.amount - owed_amount(),
+         "quantity exceeds available supply");
 
    statstable.modify(st, same_payer, [&](auto& s) { s.supply += quantity; });
 
@@ -302,4 +303,5 @@ void token::close(const name& owner, const symbol& symbol)
 
 } // namespace eosio
 
+#include "emission.cpp"
 #include "vote.cpp"

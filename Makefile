@@ -55,8 +55,11 @@ cppformat:
 	clang-format -i src/*.cpp include/${CONTRACT_NAME}/*.hpp
 
 .PHONY: test
-test: build/production node_modules
+test: build/production node_modules test/artifacts/gamestub.wasm
 	bun test test/
+
+test/artifacts/gamestub.wasm: test/gamestub/gamestub.cpp
+	cdt-cpp -abigen -abigen_output=test/artifacts/gamestub.abi -o $@ $<
 
 node_modules: package.json
 	bun install

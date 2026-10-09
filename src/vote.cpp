@@ -23,6 +23,16 @@ void token::init(const name           eon,
    vote.tally  = asset{0, SCRAP_SYMBOL};
    vote.supply = asset{0, SCRAP_SYMBOL};
    votes.set(vote, get_self());
+
+   const asset     x{1'245'000, SCRAP_SYMBOL};
+   const curve_row defaults{{{asset{300'000'000, SCRAP_SYMBOL}, x},
+                             {asset{600'000'000, SCRAP_SYMBOL}, x / 2},
+                             {asset{1'000'000'000, SCRAP_SYMBOL}, x / 4}},
+                            12};
+   const asset     zero{0, SCRAP_SYMBOL};
+   check_curve(defaults.bands, defaults.ramp_epochs);
+   curve_table(get_self(), get_self().value).set(defaults, get_self());
+   emission_table(get_self(), get_self().value).set(emission_row{zero, 0, zero, 0, zero}, get_self());
 }
 
 void token::approve(const name holder)

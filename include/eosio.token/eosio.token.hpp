@@ -180,6 +180,20 @@ public:
 
    [[eosio::action]] void logsupport(const vector<support> supporters, const bool closed);
 
+   struct curve_band
+   {
+      asset below;
+      asset per_epoch;
+   };
+
+   [[eosio::action]] void setcurve(const vector<curve_band> bands, const uint32_t ramp_epochs);
+
+   [[eosio::action]] void commit(const uint32_t closed_epoch, const uint32_t opened_epoch, const asset amount);
+
+   [[eosio::action]] void logtarget(const uint32_t closed_epoch, const uint32_t opened_epoch, const asset target);
+
+   [[eosio::action]] void mintshare(const name player, const asset quantity);
+
 #ifdef DEBUG
    /**
     * FOR DEBUGGING: This action will destroy all balances and reset the contract.
@@ -215,6 +229,10 @@ public:
    using closevote_action  = eosio::action_wrapper<"closevote"_n, &token::closevote>;
    using logratify_action  = eosio::action_wrapper<"logratify"_n, &token::logratify>;
    using logsupport_action = eosio::action_wrapper<"logsupport"_n, &token::logsupport>;
+   using setcurve_action   = eosio::action_wrapper<"setcurve"_n, &token::setcurve>;
+   using commit_action     = eosio::action_wrapper<"commit"_n, &token::commit>;
+   using logtarget_action  = eosio::action_wrapper<"logtarget"_n, &token::logtarget>;
+   using mintshare_action  = eosio::action_wrapper<"mintshare"_n, &token::mintshare>;
 
 private:
    struct [[eosio::table]] account
@@ -265,9 +283,26 @@ private:
       uint64_t primary_key() const { return account.value; }
    };
 
+   struct [[eosio::table("curve")]] curve_row
+   {
+      vector<curve_band> bands;
+      uint32_t           ramp_epochs = 0;
+   };
+
+   struct [[eosio::table("emission")]] emission_row
+   {
+      asset    owed;
+      uint32_t committed_epoch = 0;
+      asset    committed;
+      uint32_t target_epoch = 0;
+      asset    target;
+   };
+
    typedef eosio::singleton<"config"_n, config_row>        config_table;
    typedef eosio::singleton<"vote"_n, vote_row>            vote_table;
    typedef eosio::multi_index<"approvals"_n, approval_row> approvals_table;
+   typedef eosio::singleton<"curve"_n, curve_row>          curve_table;
+   typedef eosio::singleton<"emission"_n, emission_row>    emission_table;
 
    struct balance_change
    {
@@ -285,6 +320,10 @@ private:
    bool     handover_started();
    bool     try_ratify(vote_row& vote);
    void     track_vote(std::initializer_list<balance_change> changes, const bool supply_changed);
+
+   void    check_curve(const vector<curve_band>& bands, const uint32_t ramp_epochs);
+   int64_t owed_amount();
+   int64_t epoch_target(const vote_row& vote, const uint32_t epoch, const int64_t owed);
 };
 
 } // namespace eosio
