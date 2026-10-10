@@ -1,10 +1,6 @@
 namespace eosio {
 
-void token::init(const name           eon,
-                 const name           nex,
-                 const time_point_sec epoch_start,
-                 const uint32_t       epoch_seconds,
-                 const uint32_t       notice_epochs)
+void token::init(const name eon, const name nex, const uint32_t notice_epochs)
 {
    require_auth(get_self());
 
@@ -13,7 +9,10 @@ void token::init(const name           eon,
    check(is_account(eon), "eon account does not exist");
    check(is_account(nex), "nex account does not exist");
    check(eon_names_self(eon), "eon has not set this contract as its SCRAP token.");
-   check(epoch_seconds > 0, "epoch_seconds must be positive");
+   time_point_sec epoch_start;
+   uint32_t       epoch_seconds = 0;
+   check(game_clock(nex, eon, epoch_start, epoch_seconds), "nex has no game row for eon.");
+   check(epoch_seconds > 0, "The game's epoch length must be positive.");
    check(notice_epochs > 0, "notice_epochs must be positive");
    check(notice_epochs <= 12, "notice_epochs exceeds the maximum of 12");
    get_supply(get_self(), SCRAP_SYMBOL.code());
@@ -152,6 +151,24 @@ bool token::eon_names_self(const name& eon)
    }
    uint64_t token = 0;
    return db::db_get_i64(itr, &token, sizeof(token)) >= int32_t(sizeof(token)) && name(token) == get_self();
+}
+
+bool token::game_clock(const name& nex, const name& eon, time_point_sec& start, uint32_t& seconds)
+{
+   namespace db      = eosio::internal_use_do_not_use;
+   const int32_t itr = db::db_find_i64(nex.value, nex.value, "games"_n.value, eon.value);
+   if (itr < 0) {
+      return false;
+   }
+   char prefix[48];
+   if (db::db_get_i64(itr, prefix, sizeof(prefix)) < int32_t(sizeof(prefix))) {
+      return false;
+   }
+   uint32_t start_sec = 0;
+   memcpy(&seconds, prefix + 40, sizeof(seconds));
+   memcpy(&start_sec, prefix + 44, sizeof(start_sec));
+   start = time_point_sec(start_sec);
+   return true;
 }
 
 bool token::try_ratify(vote_row& vote)

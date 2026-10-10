@@ -160,11 +160,7 @@ public:
       asset weight;
    };
 
-   [[eosio::action]] void init(const name           eon,
-                               const name           nex,
-                               const time_point_sec epoch_start,
-                               const uint32_t       epoch_seconds,
-                               const uint32_t       notice_epochs);
+   [[eosio::action]] void init(const name eon, const name nex, const uint32_t notice_epochs);
 
    [[eosio::action]] void approve(const name holder);
 
@@ -322,6 +318,7 @@ private:
    uint32_t current_epoch(const config_row& config);
    bool     handover_started();
    bool     eon_names_self(const name& eon);
+   bool     game_clock(const name& nex, const name& eon, time_point_sec& start, uint32_t& seconds);
    bool     try_ratify(vote_row& vote);
    void     track_vote(std::initializer_list<balance_change> changes, const bool supply_changed);
 

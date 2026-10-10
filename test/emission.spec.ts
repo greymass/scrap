@@ -21,6 +21,7 @@ type Contract = ReturnType<Blockchain['createContract']>
 let bc: Blockchain
 let scrap: Contract
 let eon: Contract
+let nex: Contract
 
 const n = (name: string) => Name.from(name).value.value
 
@@ -36,7 +37,7 @@ async function setup(balances: Record<string, number> = {alice: 600, bob: 400}) 
     bc.createAccounts('alice', 'bob', 'carol')
     scrap = bc.createContract(TOKEN, join(ROOT, 'build/eosio.token'), true)
     eon = bc.createContract(EON, join(ROOT, 'test/artifacts/gamestub'), true)
-    const nex = bc.createContract(NEX, join(ROOT, 'include/eosio.token/eosio.token'), true)
+    nex = bc.createContract(NEX, join(ROOT, 'test/artifacts/gamestub'), true)
     for (const contract of [scrap, eon, nex]) await ready(contract)
     await eon.actions.setemitcfg([TOKEN]).send(`${EON}@active`)
 
@@ -49,9 +50,8 @@ async function setup(balances: Record<string, number> = {alice: 600, bob: 400}) 
 }
 
 async function init(start = GAME_START) {
-    await scrap.actions
-        .init([EON, NEX, TimePointSec.from(start), EPOCH_SECONDS, NOTICE_EPOCHS])
-        .send(`${TOKEN}@active`)
+    await nex.actions.setgame([EON, EPOCH_SECONDS, TimePointSec.from(start)]).send(`${NEX}@active`)
+    await scrap.actions.init([EON, NEX, NOTICE_EPOCHS]).send(`${TOKEN}@active`)
 }
 
 async function ratify(): Promise<number> {
@@ -200,12 +200,14 @@ describe('emission', () => {
             expect(emission()).toMatchObject({owed: 0, committedEpoch: 0, targetEpoch: 0})
         })
 
-        test.failing('accepts the commit for a just-ended game epoch and announces a target when its start is a few minutes off the game start', async () => {
+        test('accepts the commit for a just-ended game epoch and announces a target when the game starts a few minutes off the hour', async () => {
             await setup()
-            await init(new Date(GAME_START.getTime() + 300_000))
-            const R = epochOn(NOW)
+            const start = new Date(GAME_START.getTime() + 300_000)
+            await init(start)
+            const R = Math.floor((NOW.getTime() - start.getTime()) / 1000 / EPOCH_SECONDS) + 1
             await ratify()
-            await close(R, R + 1)
+            bc.setTime(TimePointSec.from(new Date(start.getTime() + (R * EPOCH_SECONDS + 60) * 1000)))
+            await commit(R, R + 1, 0)
             expect(announced().map((a) => a.opened)).toEqual([R + 1])
             expect(emission().targetEpoch).toBe(R + 1)
         })

@@ -22,6 +22,7 @@ let scrap: Contract
 let drops: Contract
 let epochDrops: Contract
 let eon: Contract
+let nex: Contract
 
 const n = (name: string) => Name.from(name).value.value
 
@@ -34,12 +35,14 @@ async function ready(contract: Contract) {
 async function setup(balances: Record<string, number>) {
     bc = new Blockchain()
     bc.setTime(TimePointSec.from(NOW))
-    bc.createAccounts(NEX, 'oracle', 'alice', 'bob', 'carol', 'dave', 'erin')
+    bc.createAccounts('oracle', 'alice', 'bob', 'carol', 'dave', 'erin')
     scrap = bc.createContract(TOKEN, join(ROOT, 'build/eosio.token'), true)
     drops = bc.createContract('drops', join(ROOT, 'test/artifacts/drops'), true)
     epochDrops = bc.createContract('epoch.drops', join(ROOT, 'test/artifacts/epoch.drops'), true)
     eon = bc.createContract(EON, join(ROOT, 'test/artifacts/gamestub'), true)
-    for (const contract of [scrap, drops, epochDrops, eon]) await ready(contract)
+    nex = bc.createContract(NEX, join(ROOT, 'test/artifacts/gamestub'), true)
+    for (const contract of [scrap, drops, epochDrops, eon, nex]) await ready(contract)
+    await nex.actions.setgame([EON, EPOCH_SECONDS, TimePointSec.from(GAME_START)]).send(`${NEX}@active`)
 
     await scrap.actions.create([TOKEN, '1000000000 SCRAP']).send(`${TOKEN}@active`)
     const total = Object.values(balances).reduce((a, b) => a + b, 0)
@@ -57,7 +60,7 @@ async function pointEon(token: string) {
 async function init() {
     await pointEon(TOKEN)
     await scrap.actions
-        .init([EON, NEX, TimePointSec.from(GAME_START), EPOCH_SECONDS, NOTICE_EPOCHS])
+        .init([EON, NEX, NOTICE_EPOCHS])
         .send(`${TOKEN}@active`)
 }
 
@@ -204,6 +207,7 @@ describe('holder vote', () => {
             expect(String(config.eon)).toBe(EON)
             expect(String(config.nex)).toBe(NEX)
             expect(Number(config.epoch_seconds)).toBe(EPOCH_SECONDS)
+            expect(TimePointSec.from(config.epoch_start).toDate()).toEqual(GAME_START)
             expect(Number(config.notice_epochs)).toBe(NOTICE_EPOCHS)
             expect(vote()).toMatchObject({tally: 0, ratified: false, closed: false})
             expect(payer('config', n('config'))).toBe(TOKEN)
@@ -214,7 +218,7 @@ describe('holder vote', () => {
         test('refuses while eon has no token contract set', async () => {
             await expect(
                 scrap.actions
-                    .init([EON, NEX, TimePointSec.from(GAME_START), EPOCH_SECONDS, NOTICE_EPOCHS])
+                    .init([EON, NEX, NOTICE_EPOCHS])
                     .send(`${TOKEN}@active`)
             ).rejects.toThrow('eon has not set this contract as its SCRAP token.')
         })
@@ -223,16 +227,24 @@ describe('holder vote', () => {
             await pointEon('alice')
             await expect(
                 scrap.actions
-                    .init([EON, NEX, TimePointSec.from(GAME_START), EPOCH_SECONDS, NOTICE_EPOCHS])
+                    .init([EON, NEX, NOTICE_EPOCHS])
                     .send(`${TOKEN}@active`)
             ).rejects.toThrow('eon has not set this contract as its SCRAP token.')
+            expect(scrap.tables.config(n(TOKEN)).getTableRows()).toEqual([])
+        })
+
+        test('refuses while nex has no game row for eon', async () => {
+            await pointEon(TOKEN)
+            await expect(
+                scrap.actions.init([EON, 'alice', NOTICE_EPOCHS]).send(`${TOKEN}@active`)
+            ).rejects.toThrow('nex has no game row for eon.')
             expect(scrap.tables.config(n(TOKEN)).getTableRows()).toEqual([])
         })
 
         test('requires the token account', async () => {
             await expect(
                 scrap.actions
-                    .init([EON, NEX, TimePointSec.from(GAME_START), EPOCH_SECONDS, 1])
+                    .init([EON, NEX, 1])
                     .send('alice@active')
             ).rejects.toThrow()
         })
@@ -241,7 +253,7 @@ describe('holder vote', () => {
             await pointEon(TOKEN)
             await expect(
                 scrap.actions
-                    .init([EON, NEX, TimePointSec.from(GAME_START), EPOCH_SECONDS, 0])
+                    .init([EON, NEX, 0])
                     .send(`${TOKEN}@active`)
             ).rejects.toThrow('notice_epochs must be positive')
         })
@@ -250,7 +262,7 @@ describe('holder vote', () => {
             await pointEon(TOKEN)
             await expect(
                 scrap.actions
-                    .init([EON, NEX, TimePointSec.from(GAME_START), EPOCH_SECONDS, 13])
+                    .init([EON, NEX, 13])
                     .send(`${TOKEN}@active`)
             ).rejects.toThrow('notice_epochs exceeds the maximum of 12')
         })
@@ -260,7 +272,7 @@ describe('holder vote', () => {
                 await setup({alice: 400})
                 await pointEon(TOKEN)
                 await scrap.actions
-                    .init([EON, NEX, TimePointSec.from(GAME_START), EPOCH_SECONDS, notice])
+                    .init([EON, NEX, notice])
                     .send(`${TOKEN}@active`)
             }
         })
