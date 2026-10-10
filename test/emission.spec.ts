@@ -47,9 +47,9 @@ async function setup(balances: Record<string, number> = {alice: 600, bob: 400}) 
     }
 }
 
-async function init() {
+async function init(start = GAME_START) {
     await scrap.actions
-        .init([EON, NEX, TimePointSec.from(GAME_START), EPOCH_SECONDS, NOTICE_EPOCHS])
+        .init([EON, NEX, TimePointSec.from(start), EPOCH_SECONDS, NOTICE_EPOCHS])
         .send(`${TOKEN}@active`)
 }
 
@@ -197,6 +197,16 @@ describe('emission', () => {
             await close(R, R + 1, 500)
             expect(announced()).toEqual([])
             expect(emission()).toMatchObject({owed: 0, committedEpoch: 0, targetEpoch: 0})
+        })
+
+        test.failing('accepts the commit for a just-ended game epoch and announces a target when its start is a few minutes off the game start', async () => {
+            await setup()
+            await init(new Date(GAME_START.getTime() + 300_000))
+            const R = epochOn(NOW)
+            await ratify()
+            await close(R, R + 1)
+            expect(announced().map((a) => a.opened)).toEqual([R + 1])
+            expect(emission().targetEpoch).toBe(R + 1)
         })
 
         test('ramps from SCRAP_START in twelve steps', async () => {
