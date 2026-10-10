@@ -177,7 +177,7 @@ uint64_t token::get_mint_amount(const uint64_t current_supply)
 void token::issue(const name& to, const asset& quantity, const string& memo)
 {
    auto sym = quantity.symbol;
-   check(sym.is_valid(), "invalid symbol name");
+   check(sym == SCRAP_SYMBOL, "only SCRAP is supported");
    check(memo.size() <= 256, "memo has more than 256 bytes");
 
    stats statstable(get_self(), sym.code().raw());
@@ -203,7 +203,7 @@ void token::issue(const name& to, const asset& quantity, const string& memo)
 void token::retire(const asset& quantity, const string& memo)
 {
    auto sym = quantity.symbol;
-   check(sym.is_valid(), "invalid symbol name");
+   check(sym == SCRAP_SYMBOL, "only SCRAP is supported");
    check(memo.size() <= 256, "memo has more than 256 bytes");
 
    stats statstable(get_self(), sym.code().raw());
@@ -228,6 +228,7 @@ void token::transfer(const name& from, const name& to, const asset& quantity, co
    check(from != to, "cannot transfer to self");
    require_auth(from);
    check(is_account(to), "to account does not exist");
+   check(quantity.symbol == SCRAP_SYMBOL, "only SCRAP is supported");
    auto        sym = quantity.symbol.code();
    stats       statstable(get_self(), sym.raw());
    const auto& st = statstable.get(sym.raw());
@@ -278,6 +279,7 @@ void token::open(const name& owner, const symbol& symbol, const name& ram_payer)
    require_auth(ram_payer);
 
    check(is_account(owner), "owner account does not exist");
+   check(symbol == SCRAP_SYMBOL, "only SCRAP is supported");
 
    auto        sym_code_raw = symbol.code().raw();
    stats       statstable(get_self(), sym_code_raw);

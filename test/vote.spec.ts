@@ -282,6 +282,27 @@ describe('holder vote', () => {
             expect(vote().tally).toBe(balance('alice') + balance('dave') + balance(TOKEN))
         })
 
+        test('a second created symbol cannot be issued, opened, transferred or retired', async () => {
+            await setup({alice: 400, bob: 600})
+            await init()
+            await approve('alice')
+            await scrap.actions.create([TOKEN, '1000 OTHER']).send(`${TOKEN}@active`)
+
+            await expect(
+                scrap.actions.issue([TOKEN, '100 OTHER', '']).send(`${TOKEN}@active`)
+            ).rejects.toThrow('only SCRAP is supported')
+            await expect(
+                scrap.actions.open(['alice', '0,OTHER', 'alice']).send('alice@active')
+            ).rejects.toThrow('only SCRAP is supported')
+            await expect(
+                scrap.actions.transfer(['alice', 'bob', '1 OTHER', '']).send('alice@active')
+            ).rejects.toThrow('only SCRAP is supported')
+            await expect(
+                scrap.actions.retire(['1 OTHER', '']).send(`${TOKEN}@active`)
+            ).rejects.toThrow('only SCRAP is supported')
+            expectTallyMatchesApprovers()
+        })
+
         test('approve twice and withdraw without approving refuse', async () => {
             await setup({alice: 400, bob: 600})
             await init()
