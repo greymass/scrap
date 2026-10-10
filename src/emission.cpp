@@ -20,7 +20,9 @@ void token::commit(const uint32_t closed_epoch, const uint32_t opened_epoch, con
    }
 
    const config_row config = config_tbl.get();
-   check(get_sender() == config.eon, "Only the game commits SCRAP to Shares.");
+   if (get_sender() != config.eon) {
+      return;
+   }
 
    const vote_row vote = votes.get();
    if (!vote.ratified) {

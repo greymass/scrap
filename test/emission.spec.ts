@@ -400,19 +400,19 @@ describe('emission', () => {
             expect(scrap.tables.emission(n(TOKEN)).getTableRows()).toEqual([])
         })
 
-        test('is refused from anyone but the game', async () => {
-            await ratify()
+        test('completes without effect when anyone but the game sends it', async () => {
+            const start = await ratify()
+            await walkTo(start)
+            const before = emission()
             const relay = bc.createContract('relay', join(ROOT, 'test/artifacts/gamestub'), true)
             await ready(relay)
-            await expect(
-                relay.actions.sendcommit([TOKEN, 1, 2, '10 SCRAP']).send('relay@active')
-            ).rejects.toThrow('Only the game commits SCRAP to Shares.')
-            await expect(
-                scrap.actions.commit([1, 2, '10 SCRAP']).send('alice@active')
-            ).rejects.toThrow('Only the game commits SCRAP to Shares.')
-            await expect(
-                scrap.actions.commit([1, 2, '10 SCRAP']).send(`${EON}@active`)
-            ).rejects.toThrow('Only the game commits SCRAP to Shares.')
+            at(start + 1)
+            await relay.actions.sendcommit([TOKEN, start, start + 1, `${X} SCRAP`]).send('relay@active')
+            await scrap.actions.commit([start, start + 1, `${X} SCRAP`]).send('alice@active')
+            await scrap.actions.commit([start, start + 1, `${X} SCRAP`]).send(`${EON}@active`)
+            expect(emission()).toEqual(before)
+            expect(announced()).toEqual([])
+            expectInvariants()
         })
     })
 
