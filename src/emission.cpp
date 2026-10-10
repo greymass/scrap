@@ -102,9 +102,11 @@ void token::check_curve(const vector<curve_band>& bands, const uint32_t ramp_epo
       check(band.below.symbol == SCRAP_SYMBOL && band.per_epoch.symbol == SCRAP_SYMBOL, "symbol precision mismatch");
       check(band.below.amount > below, "Band edges must increase.");
       check(band.below.amount <= max_supply.amount, "A band edge exceeds the maximum supply.");
-      check(band.per_epoch.amount >= 0 && band.per_epoch.amount <= max_supply.amount, "A band target is out of range.");
+      check(band.per_epoch.amount > 0, "A band target must be positive.");
+      check(band.per_epoch.amount <= max_supply.amount, "A band target is out of range.");
       below = band.below.amount;
    }
+   check(below == max_supply.amount, "The last band edge must equal the maximum supply.");
 }
 
 int64_t token::owed_amount()
@@ -137,9 +139,11 @@ int64_t token::epoch_target(const vote_row& vote, const uint32_t epoch, const in
    }
 
    int64_t per_epoch = 0;
+   int64_t room      = st->max_supply.amount - issued;
    for (const auto& band : curve.bands) {
       if (issued < band.below.amount) {
          per_epoch = band.per_epoch.amount;
+         room      = band.below.amount - issued;
          break;
       }
    }
@@ -149,7 +153,7 @@ int64_t token::epoch_target(const vote_row& vote, const uint32_t epoch, const in
       per_epoch = static_cast<int64_t>(uint64_t(per_epoch) * step / curve.ramp_epochs);
    }
 
-   return std::min(per_epoch, st->max_supply.amount - issued);
+   return std::min(per_epoch, room);
 }
 
 } // namespace eosio

@@ -229,12 +229,33 @@ describe('emission', () => {
                 ],
                 1
             )
-            await issue(299_000_000)
+            await issue(298_754_000)
             await walkTo(start)
             expect(emission().target).toBe(X)
 
             await close(start, start + 1, X)
-            expect(supply() + emission().owed).toBe(299_001_000 + X)
+            expect(supply() + emission().owed).toBe(300_000_000)
+            expect(announced()[0].target).toBe(X / 2)
+            expectInvariants()
+        })
+
+        test('stops a target at the band edge it would cross', async () => {
+            const start = await ratify()
+            await setcurve(
+                [
+                    [300_000_000, X],
+                    [600_000_000, X / 2],
+                    [MAX, X / 4],
+                ],
+                1
+            )
+            await issue(299_500_000)
+            await walkTo(start)
+            expect(300_000_000 - (supply() + emission().owed)).toBe(499_000)
+            expect(emission().target).toBe(499_000)
+
+            await close(start, start + 1, 499_000)
+            expect(supply() + emission().owed).toBe(300_000_000)
             expect(announced()[0].target).toBe(X / 2)
             expectInvariants()
         })
@@ -428,6 +449,24 @@ describe('emission', () => {
                 'A band edge exceeds the maximum supply.'
             )
             await expect(setcurve([[MAX, X]], 0)).rejects.toThrow('ramp_epochs must be positive')
+        })
+
+        test('refuses a last band edge below the maximum supply', async () => {
+            await expect(setcurve([[600_000_000, X]], 12)).rejects.toThrow(
+                'The last band edge must equal the maximum supply.'
+            )
+        })
+
+        test('refuses a band with no target', async () => {
+            await expect(
+                setcurve(
+                    [
+                        [300_000_000, 0],
+                        [MAX, X],
+                    ],
+                    12
+                )
+            ).rejects.toThrow('A band target must be positive.')
         })
     })
 

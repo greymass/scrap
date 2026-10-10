@@ -14,6 +14,7 @@ void token::init(const name           eon,
    check(is_account(nex), "nex account does not exist");
    check(epoch_seconds > 0, "epoch_seconds must be positive");
    check(notice_epochs > 0, "notice_epochs must be positive");
+   check(notice_epochs <= 12, "notice_epochs exceeds the maximum of 12");
    get_supply(get_self(), SCRAP_SYMBOL.code());
 
    config.set(config_row{eon, nex, epoch_start, epoch_seconds, notice_epochs}, get_self());

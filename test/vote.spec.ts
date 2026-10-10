@@ -220,6 +220,23 @@ describe('holder vote', () => {
                     .send(`${TOKEN}@active`)
             ).rejects.toThrow('notice_epochs must be positive')
         })
+
+        test('refuses a notice above twelve epochs', async () => {
+            await expect(
+                scrap.actions
+                    .init([EON, NEX, TimePointSec.from(GAME_START), EPOCH_SECONDS, 13])
+                    .send(`${TOKEN}@active`)
+            ).rejects.toThrow('notice_epochs exceeds the maximum of 12')
+        })
+
+        test('accepts a notice of one and of twelve epochs', async () => {
+            for (const notice of [1, 12]) {
+                await setup({alice: 400})
+                await scrap.actions
+                    .init([EON, NEX, TimePointSec.from(GAME_START), EPOCH_SECONDS, notice])
+                    .send(`${TOKEN}@active`)
+            }
+        })
     })
 
     describe('tally', () => {
