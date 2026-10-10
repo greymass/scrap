@@ -192,6 +192,8 @@ public:
 
    [[eosio::action]] void logtarget(const uint32_t closed_epoch, const uint32_t opened_epoch, const asset target);
 
+   [[eosio::action]] void logcommit(const uint32_t closed_epoch, const asset accepted);
+
    [[eosio::action]] void mintshare(const name player, const asset quantity);
 
 #ifdef DEBUG
@@ -232,6 +234,7 @@ public:
    using setcurve_action   = eosio::action_wrapper<"setcurve"_n, &token::setcurve>;
    using commit_action     = eosio::action_wrapper<"commit"_n, &token::commit>;
    using logtarget_action  = eosio::action_wrapper<"logtarget"_n, &token::logtarget>;
+   using logcommit_action  = eosio::action_wrapper<"logcommit"_n, &token::logcommit>;
    using mintshare_action  = eosio::action_wrapper<"mintshare"_n, &token::mintshare>;
 
 private:

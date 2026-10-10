@@ -38,15 +38,20 @@ void token::commit(const uint32_t closed_epoch, const uint32_t opened_epoch, con
    auto           emission  = emission_tbl.get();
    const uint32_t now_epoch = current_epoch(config);
 
-   if (closed_epoch == emission.target_epoch && closed_epoch > emission.committed_epoch && closed_epoch < now_epoch) {
-      const int64_t room     = st->max_supply.amount - st->supply.amount - emission.owed.amount;
-      int64_t       accepted = 0;
-      if (amount.symbol == SCRAP_SYMBOL && amount.amount > 0) {
-         accepted = std::min({amount.amount, emission.target.amount, std::max<int64_t>(room, 0)});
+   if (closed_epoch > emission.committed_epoch) {
+      int64_t accepted = 0;
+      if (closed_epoch == emission.target_epoch && closed_epoch < now_epoch) {
+         const int64_t room = st->max_supply.amount - st->supply.amount - emission.owed.amount;
+         if (amount.symbol == SCRAP_SYMBOL && amount.amount > 0) {
+            accepted = std::min({amount.amount, emission.target.amount, std::max<int64_t>(room, 0)});
+         }
+         emission.owed.amount += accepted;
+         emission.committed_epoch = closed_epoch;
+         emission.committed       = asset{accepted, SCRAP_SYMBOL};
       }
-      emission.owed.amount += accepted;
-      emission.committed_epoch = closed_epoch;
-      emission.committed       = asset{accepted, SCRAP_SYMBOL};
+
+      token::logcommit_action logcommit{get_self(), {get_self(), "active"_n}};
+      logcommit.send(closed_epoch, asset{accepted, SCRAP_SYMBOL});
    }
 
    if (opened_epoch > closed_epoch && opened_epoch > emission.target_epoch && opened_epoch <= now_epoch) {
@@ -61,6 +66,13 @@ void token::commit(const uint32_t closed_epoch, const uint32_t opened_epoch, con
 }
 
 void token::logtarget(const uint32_t closed_epoch, const uint32_t opened_epoch, const asset target)
+{
+   require_auth(get_self());
+   config_table config(get_self(), get_self().value);
+   require_recipient(config.get().eon);
+}
+
+void token::logcommit(const uint32_t closed_epoch, const asset accepted)
 {
    require_auth(get_self());
    config_table config(get_self(), get_self().value);

@@ -145,6 +145,16 @@ function announced(): {closed: number; opened: number; target: number}[] {
     })
 }
 
+function reported(): {closed: number; accepted: number}[] {
+    return traces('logcommit', EON).map((t: any) => {
+        expect(t.isNotification).toBe(true)
+        const data = Serializer.objectify(
+            Serializer.decode({data: t.data, abi: (scrap as any).abi, type: 'logcommit'})
+        )
+        return {closed: Number(data.closed_epoch), accepted: Asset.from(data.accepted).value}
+    })
+}
+
 function expectInvariants() {
     expect(supply()).toBe(HOLDERS.reduce((sum, holder) => sum + balance(holder), 0))
     expect(supply() + emission().owed).toBeLessThanOrEqual(MAX)
@@ -347,6 +357,22 @@ describe('emission', () => {
             await commit(start, start + 1, target)
             expect(emission()).toEqual(after)
             expect(announced()).toEqual([])
+            expect(reported()).toEqual([])
+        })
+
+        test('reports the amount it accepted for the closed epoch to the game when the opened epoch is rejected', async () => {
+            const start = await ratify()
+            await walkTo(start)
+            const target = emission().target
+            const left = target / 2
+            await issue(MAX - supply() - emission().owed - left)
+
+            at(start + 1)
+            await commit(start, start + 2, target)
+            expect(emission()).toMatchObject({committedEpoch: start, committed: left, targetEpoch: start})
+            expect(announced()).toEqual([])
+            expect(reported()).toEqual([{closed: start, accepted: left}])
+            expectInvariants()
         })
 
         test('clamps a commit for an epoch still open on its own clock to 0', async () => {
@@ -358,6 +384,7 @@ describe('emission', () => {
             await commit(start, start + 1, before.target)
             expect(emission()).toEqual(before)
             expect(announced()).toEqual([])
+            expect(reported()).toEqual([{closed: start, accepted: 0}])
 
             at(start + 1)
             await commit(start, start + 1, before.target)
