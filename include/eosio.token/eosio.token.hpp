@@ -321,6 +321,7 @@ private:
    int64_t  balance_of(const name& owner);
    uint32_t current_epoch(const config_row& config);
    bool     handover_started();
+   bool     eon_names_self(const name& eon);
    bool     try_ratify(vote_row& vote);
    void     track_vote(std::initializer_list<balance_change> changes, const bool supply_changed);
 

@@ -21,6 +21,7 @@ let bc: Blockchain
 let scrap: Contract
 let drops: Contract
 let epochDrops: Contract
+let eon: Contract
 
 const n = (name: string) => Name.from(name).value.value
 
@@ -37,7 +38,7 @@ async function setup(balances: Record<string, number>) {
     scrap = bc.createContract(TOKEN, join(ROOT, 'build/eosio.token'), true)
     drops = bc.createContract('drops', join(ROOT, 'test/artifacts/drops'), true)
     epochDrops = bc.createContract('epoch.drops', join(ROOT, 'test/artifacts/epoch.drops'), true)
-    const eon = bc.createContract(EON, join(ROOT, 'include/eosio.token/eosio.token'), true)
+    eon = bc.createContract(EON, join(ROOT, 'test/artifacts/gamestub'), true)
     for (const contract of [scrap, drops, epochDrops, eon]) await ready(contract)
 
     await scrap.actions.create([TOKEN, '1000000000 SCRAP']).send(`${TOKEN}@active`)
@@ -49,7 +50,12 @@ async function setup(balances: Record<string, number>) {
     await drops.actions.enable([true]).send('drops@active')
 }
 
+async function pointEon(token: string) {
+    await eon.actions.setemitcfg([token]).send(`${EON}@active`)
+}
+
 async function init() {
+    await pointEon(TOKEN)
     await scrap.actions
         .init([EON, NEX, TimePointSec.from(GAME_START), EPOCH_SECONDS, NOTICE_EPOCHS])
         .send(`${TOKEN}@active`)
@@ -205,6 +211,24 @@ describe('holder vote', () => {
             await expect(init()).rejects.toThrow('The handover is already initialized.')
         })
 
+        test('refuses while eon has no token contract set', async () => {
+            await expect(
+                scrap.actions
+                    .init([EON, NEX, TimePointSec.from(GAME_START), EPOCH_SECONDS, NOTICE_EPOCHS])
+                    .send(`${TOKEN}@active`)
+            ).rejects.toThrow('eon has not set this contract as its SCRAP token.')
+        })
+
+        test('refuses while eon names another token contract', async () => {
+            await pointEon('alice')
+            await expect(
+                scrap.actions
+                    .init([EON, NEX, TimePointSec.from(GAME_START), EPOCH_SECONDS, NOTICE_EPOCHS])
+                    .send(`${TOKEN}@active`)
+            ).rejects.toThrow('eon has not set this contract as its SCRAP token.')
+            expect(scrap.tables.config(n(TOKEN)).getTableRows()).toEqual([])
+        })
+
         test('requires the token account', async () => {
             await expect(
                 scrap.actions
@@ -214,6 +238,7 @@ describe('holder vote', () => {
         })
 
         test('refuses a zero notice', async () => {
+            await pointEon(TOKEN)
             await expect(
                 scrap.actions
                     .init([EON, NEX, TimePointSec.from(GAME_START), EPOCH_SECONDS, 0])
@@ -222,6 +247,7 @@ describe('holder vote', () => {
         })
 
         test('refuses a notice above twelve epochs', async () => {
+            await pointEon(TOKEN)
             await expect(
                 scrap.actions
                     .init([EON, NEX, TimePointSec.from(GAME_START), EPOCH_SECONDS, 13])
@@ -232,10 +258,32 @@ describe('holder vote', () => {
         test('accepts a notice of one and of twelve epochs', async () => {
             for (const notice of [1, 12]) {
                 await setup({alice: 400})
+                await pointEon(TOKEN)
                 await scrap.actions
                     .init([EON, NEX, TimePointSec.from(GAME_START), EPOCH_SECONDS, notice])
                     .send(`${TOKEN}@active`)
             }
+        })
+    })
+
+    describe('ratification while eon names another token contract', () => {
+        beforeEach(async () => {
+            await setup({alice: 400, bob: 300})
+            await init()
+            await pointEon('bob')
+        })
+
+        test('waits with the tally kept and announces nothing', async () => {
+            await approve('alice')
+            expect(vote()).toMatchObject({tally: 400, ratified: false})
+            expect(scrap.tables.approvals(n(TOKEN)).getTableRows().length).toBe(1)
+        })
+
+        test('ratifies on a later approval once eon names scrap', async () => {
+            await approve('alice')
+            await pointEon(TOKEN)
+            await approve('erin')
+            expect(vote()).toMatchObject({tally: 400, ratified: true})
         })
     })
 

@@ -4,6 +4,16 @@
     "types": [],
     "structs": [
         {
+            "name": "emitcfg_row",
+            "base": "",
+            "fields": [
+                {
+                    "name": "token_contract",
+                    "type": "name"
+                }
+            ]
+        },
+        {
             "name": "sendcommit",
             "base": "",
             "fields": [
@@ -42,6 +52,16 @@
                     "type": "asset"
                 }
             ]
+        },
+        {
+            "name": "setemitcfg",
+            "base": "",
+            "fields": [
+                {
+                    "name": "token_contract",
+                    "type": "name"
+                }
+            ]
         }
     ],
     "actions": [
@@ -54,9 +74,22 @@
             "name": "sendmint",
             "type": "sendmint",
             "ricardian_contract": ""
+        },
+        {
+            "name": "setemitcfg",
+            "type": "setemitcfg",
+            "ricardian_contract": ""
         }
     ],
-    "tables": [],
+    "tables": [
+        {
+            "name": "emitcfg",
+            "type": "emitcfg_row",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": []
+        }
+    ],
     "ricardian_clauses": [],
     "variants": [],
     "action_results": []

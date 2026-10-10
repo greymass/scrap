@@ -12,6 +12,7 @@ void token::init(const name           eon,
    check(!config.exists(), "The handover is already initialized.");
    check(is_account(eon), "eon account does not exist");
    check(is_account(nex), "nex account does not exist");
+   check(eon_names_self(eon), "eon has not set this contract as its SCRAP token.");
    check(epoch_seconds > 0, "epoch_seconds must be positive");
    check(notice_epochs > 0, "notice_epochs must be positive");
    check(notice_epochs <= 12, "notice_epochs exceeds the maximum of 12");
@@ -142,6 +143,17 @@ bool token::handover_started()
    return vote.ratified && current_time_point().sec_since_epoch() >= vote.start_time.sec_since_epoch();
 }
 
+bool token::eon_names_self(const name& eon)
+{
+   namespace db      = eosio::internal_use_do_not_use;
+   const int32_t itr = db::db_find_i64(eon.value, eon.value, "emitcfg"_n.value, "emitcfg"_n.value);
+   if (itr < 0) {
+      return false;
+   }
+   uint64_t token = 0;
+   return db::db_get_i64(itr, &token, sizeof(token)) >= int32_t(sizeof(token)) && name(token) == get_self();
+}
+
 bool token::try_ratify(vote_row& vote)
 {
    const asset supply = get_supply(get_self(), SCRAP_SYMBOL.code());
@@ -151,6 +163,9 @@ bool token::try_ratify(vote_row& vote)
 
    config_table     config_tbl(get_self(), get_self().value);
    const config_row config = config_tbl.get();
+   if (!eon_names_self(config.eon)) {
+      return false;
+   }
 
    vote.ratified       = true;
    vote.supply         = supply;

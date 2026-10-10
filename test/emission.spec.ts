@@ -38,6 +38,7 @@ async function setup(balances: Record<string, number> = {alice: 600, bob: 400}) 
     eon = bc.createContract(EON, join(ROOT, 'test/artifacts/gamestub'), true)
     const nex = bc.createContract(NEX, join(ROOT, 'include/eosio.token/eosio.token'), true)
     for (const contract of [scrap, eon, nex]) await ready(contract)
+    await eon.actions.setemitcfg([TOKEN]).send(`${EON}@active`)
 
     await scrap.actions.create([TOKEN, `${MAX} SCRAP`]).send(`${TOKEN}@active`)
     const total = Object.values(balances).reduce((a, b) => a + b, 0)
