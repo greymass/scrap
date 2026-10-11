@@ -6,6 +6,7 @@ void token::setcurve(const vector<curve_band> bands, const uint32_t ramp_epochs)
 
    curve_table curve(get_self(), get_self().value);
    check(curve.exists(), "The handover is not initialized.");
+   check(!vote_table(get_self(), get_self().value).get().ratified, "The curve is fixed once the vote has ratified.");
    check_curve(bands, ramp_epochs);
    curve.set(curve_row{bands, ramp_epochs}, get_self());
 }

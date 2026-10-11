@@ -7,6 +7,7 @@ void token::create(const name& issuer, const asset& maximum_supply)
    require_auth(get_self());
 
    auto sym = maximum_supply.symbol;
+   check(sym == SCRAP_SYMBOL, "only SCRAP is supported");
    check(maximum_supply.is_valid(), "invalid supply");
    check(maximum_supply.amount > 0, "max-supply must be positive");
 
@@ -174,6 +175,7 @@ uint64_t token::get_mint_amount(const uint64_t current_supply)
    }
 }
 
+#ifdef DEBUG
 void token::issue(const name& to, const asset& quantity, const string& memo)
 {
    auto sym = quantity.symbol;
@@ -222,6 +224,7 @@ void token::retire(const asset& quantity, const string& memo)
    const int64_t before = sub_balance(st.issuer, quantity);
    track_vote({{st.issuer, before, before - quantity.amount}}, true);
 }
+#endif
 
 void token::transfer(const name& from, const name& to, const asset& quantity, const string& memo)
 {

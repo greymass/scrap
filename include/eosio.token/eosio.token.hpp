@@ -101,6 +101,7 @@ public:
                                   const checksum256         hash,
                                   const vector<mint_result> results);
 
+#ifdef DEBUG
    /**
     *  This action issues to `to` account a `quantity` of tokens.
     *
@@ -118,6 +119,7 @@ public:
     * @param memo - the memo string to accompany the transaction.
     */
    [[eosio::action]] void retire(const asset& quantity, const string& memo);
+#endif
 
    /**
     * Allows `from` account to transfer to `to` account the `quantity` tokens.
@@ -213,9 +215,11 @@ public:
       return ac.balance;
    }
 
-   using create_action   = eosio::action_wrapper<"create"_n, &token::create>;
-   using issue_action    = eosio::action_wrapper<"issue"_n, &token::issue>;
-   using retire_action   = eosio::action_wrapper<"retire"_n, &token::retire>;
+   using create_action = eosio::action_wrapper<"create"_n, &token::create>;
+#ifdef DEBUG
+   using issue_action  = eosio::action_wrapper<"issue"_n, &token::issue>;
+   using retire_action = eosio::action_wrapper<"retire"_n, &token::retire>;
+#endif
    using transfer_action = eosio::action_wrapper<"transfer"_n, &token::transfer>;
    using open_action     = eosio::action_wrapper<"open"_n, &token::open>;
    using close_action    = eosio::action_wrapper<"close"_n, &token::close>;

@@ -43,7 +43,7 @@ async function setup(balances: Record<string, number> = {alice: 600, bob: 400}) 
 
     await scrap.actions.create([TOKEN, `${MAX} SCRAP`]).send(`${TOKEN}@active`)
     const total = Object.values(balances).reduce((a, b) => a + b, 0)
-    await issue(total)
+    seed(total)
     for (const [holder, amount] of Object.entries(balances)) {
         await scrap.actions.transfer([TOKEN, holder, `${amount} SCRAP`, '']).send(`${TOKEN}@active`)
     }
@@ -61,8 +61,15 @@ async function ratify(): Promise<number> {
     return Number(row.start_epoch)
 }
 
-async function issue(amount: number) {
-    await scrap.actions.issue([TOKEN, `${amount} SCRAP`, '']).send(`${TOKEN}@active`)
+function seed(amount: number) {
+    const stat = scrap.tables.stat(SCRAP_CODE)
+    stat.set(SCRAP_CODE, Name.from(TOKEN), {
+        ...stat.getTableRow(SCRAP_CODE),
+        supply: `${supply() + amount} SCRAP`,
+    })
+    scrap.tables
+        .accounts(n(TOKEN))
+        .set(SCRAP_CODE, Name.from(TOKEN), {balance: `${balance(TOKEN) + amount} SCRAP`})
 }
 
 async function setcurve(bands: [number, number][], ramp: number, auth = `${TOKEN}@active`) {
@@ -242,8 +249,7 @@ describe('emission', () => {
             expectInvariants()
         })
 
-        test('steps down when issued SCRAP crosses a band', async () => {
-            const start = await ratify()
+        test('steps down when supply crosses a band', async () => {
             await setcurve(
                 [
                     [300_000_000, X],
@@ -252,7 +258,8 @@ describe('emission', () => {
                 ],
                 1
             )
-            await issue(298_754_000)
+            const start = await ratify()
+            seed(298_754_000)
             await walkTo(start)
             expect(emission().target).toBe(X)
 
@@ -263,7 +270,6 @@ describe('emission', () => {
         })
 
         test('stops a target at the band edge it would cross', async () => {
-            const start = await ratify()
             await setcurve(
                 [
                     [300_000_000, X],
@@ -272,7 +278,8 @@ describe('emission', () => {
                 ],
                 1
             )
-            await issue(299_500_000)
+            const start = await ratify()
+            seed(299_500_000)
             await walkTo(start)
             expect(300_000_000 - (supply() + emission().owed)).toBe(499_000)
             expect(emission().target).toBe(499_000)
@@ -284,7 +291,6 @@ describe('emission', () => {
         })
 
         test('pays only the remainder in the final epoch below 1B', async () => {
-            const start = await ratify()
             await setcurve(
                 [
                     [300_000_000, X],
@@ -293,7 +299,8 @@ describe('emission', () => {
                 ],
                 1
             )
-            await issue(999_800_000)
+            const start = await ratify()
+            seed(999_800_000)
             await walkTo(start)
             const remainder = MAX - supply()
             expect(remainder).toBe(199_000)
@@ -305,7 +312,6 @@ describe('emission', () => {
 
             await close(start + 1, start + 2, 5)
             expect(emission()).toMatchObject({owed: remainder, committed: 0, target: 0})
-            await expect(issue(1)).rejects.toThrow('quantity exceeds available supply')
 
             await mintshare('alice', remainder)
             expect(supply()).toBe(MAX)
@@ -400,7 +406,7 @@ describe('emission', () => {
             await walkTo(start)
             const target = emission().target
             const left = target / 2
-            await issue(MAX - supply() - emission().owed - left)
+            seed(MAX - supply() - emission().owed - left)
 
             at(start + 1)
             await commit(start, start + 2, target)
@@ -484,16 +490,18 @@ describe('emission', () => {
             await init()
         })
 
-        test('applies from the next announcement', async () => {
+        test('sets the curve the ratified handover runs', async () => {
+            await setcurve([[MAX, 2 * X]], 12)
             const start = await ratify()
             await walkTo(start)
-            expect(emission().target).toBe(X / 12)
+            expect(emission().target).toBe((2 * X) / 12)
+        })
 
-            await setcurve([[MAX, 2 * X]], 12)
-            expect(emission().target).toBe(X / 12)
-
-            await close(start, start + 1, X / 12)
-            expect(emission().target).toBe((2 * X * 2) / 12)
+        test('refuses once the vote has ratified', async () => {
+            await ratify()
+            await expect(setcurve([[MAX, X / 2]], 12)).rejects.toThrow(
+                'The curve is fixed once the vote has ratified.'
+            )
         })
 
         test('requires the token account and a valid curve', async () => {

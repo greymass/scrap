@@ -4,7 +4,7 @@ import {join} from 'node:path'
 
 const ROOT = join(import.meta.dir, '..')
 const DEPLOY_TARGETS = ['devnet', 'testnet', 'mainnet']
-const TEST_ONLY_ACTIONS = ['destroy']
+const TEST_ONLY_ACTIONS = ['destroy', 'issue', 'retire']
 
 function dryRun(target: string): string {
     const result = Bun.spawnSync(['make', '-n', '-C', ROOT, target])

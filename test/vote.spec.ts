@@ -46,7 +46,7 @@ async function setup(balances: Record<string, number>) {
 
     await scrap.actions.create([TOKEN, '1000000000 SCRAP']).send(`${TOKEN}@active`)
     const total = Object.values(balances).reduce((a, b) => a + b, 0)
-    await scrap.actions.issue([TOKEN, `${total} SCRAP`, '']).send(`${TOKEN}@active`)
+    seed(total)
     for (const [holder, amount] of Object.entries(balances)) {
         if (holder !== TOKEN) await transfer(TOKEN, holder, amount)
     }
@@ -84,6 +84,17 @@ async function withdraw(holder: string) {
 function balance(account: string): number {
     const row = scrap.tables.accounts(n(account)).getTableRow(SCRAP_CODE)
     return row ? Asset.from(row.balance).value : 0
+}
+
+function seed(amount: number) {
+    const stat = scrap.tables.stat(SCRAP_CODE)
+    stat.set(SCRAP_CODE, Name.from(TOKEN), {
+        ...stat.getTableRow(SCRAP_CODE),
+        supply: `${supply() + amount} SCRAP`,
+    })
+    scrap.tables
+        .accounts(n(TOKEN))
+        .set(SCRAP_CODE, Name.from(TOKEN), {balance: `${balance(TOKEN) + amount} SCRAP`})
 }
 
 function supply(): number {
@@ -316,17 +327,6 @@ describe('holder vote', () => {
                 ['erin approves with no balance', () => approve('erin')],
                 ['non-approver sends to erin', () => transfer('carol', 'erin', 30)],
                 ['the issuer approves', () => approve(TOKEN)],
-                [
-                    'issue to the approving issuer',
-                    () =>
-                        scrap.actions
-                            .issue([TOKEN, '100 SCRAP', ''])
-                            .send(`${TOKEN}@active`),
-                ],
-                [
-                    'retire from the approving issuer',
-                    () => scrap.actions.retire(['40 SCRAP', '']).send(`${TOKEN}@active`),
-                ],
                 ['Droplets mint to an approver', () => destroy('alice', [minted[0]])],
                 ['erin withdraws', () => withdraw('erin')],
                 ['dave approves again', () => approve('dave')],
@@ -342,14 +342,12 @@ describe('holder vote', () => {
             expect(vote().tally).toBe(balance('alice') + balance('dave') + balance(TOKEN))
         })
 
-        test('a second created symbol cannot be issued, opened, transferred or retired', async () => {
+        test('create, open and transfer refuse any symbol but SCRAP', async () => {
             await setup({alice: 400, bob: 600})
             await init()
             await approve('alice')
-            await scrap.actions.create([TOKEN, '1000 OTHER']).send(`${TOKEN}@active`)
-
             await expect(
-                scrap.actions.issue([TOKEN, '100 OTHER', '']).send(`${TOKEN}@active`)
+                scrap.actions.create([TOKEN, '1000 OTHER']).send(`${TOKEN}@active`)
             ).rejects.toThrow('only SCRAP is supported')
             await expect(
                 scrap.actions.open(['alice', '0,OTHER', 'alice']).send('alice@active')
@@ -357,10 +355,10 @@ describe('holder vote', () => {
             await expect(
                 scrap.actions.transfer(['alice', 'bob', '1 OTHER', '']).send('alice@active')
             ).rejects.toThrow('only SCRAP is supported')
-            await expect(
-                scrap.actions.retire(['1 OTHER', '']).send(`${TOKEN}@active`)
-            ).rejects.toThrow('only SCRAP is supported')
             expectTallyMatchesApprovers()
+            await expect(
+                scrap.actions.create([TOKEN, '1000000000 SCRAP']).send(`${TOKEN}@active`)
+            ).rejects.toThrow('token with symbol already exists')
         })
 
         test('approve twice and withdraw without approving refuse', async () => {
@@ -424,15 +422,6 @@ describe('holder vote', () => {
             await destroy('alice', [minted[0]])
             expect(vote()).toMatchObject({tally: 508, ratified: true, supply: 1008})
             expectRatifiedNotice(508, 1008)
-        })
-
-        test('latches on a retire by a non-approving issuer', async () => {
-            await setup({alice: 500, bob: 400, [TOKEN]: 100})
-            await init()
-            await approve('alice')
-            await scrap.actions.retire(['1 SCRAP', '']).send(`${TOKEN}@active`)
-            expect(vote()).toMatchObject({tally: 500, ratified: true, supply: 999})
-            expectRatifiedNotice(500, 999)
         })
 
         test('freezes the vote and snapshots supporters on their first change', async () => {
