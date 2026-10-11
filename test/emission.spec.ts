@@ -332,6 +332,28 @@ describe('emission', () => {
             expectInvariants()
         })
 
+        test.failing('announces no target for an epoch the game opens behind the wall clock', async () => {
+            const start = await ratify()
+            await walkTo(start)
+            await close(start, start + 1, emission().target)
+            const target = emission().target
+
+            at(start + 5)
+            await commit(start + 1, start + 2, target)
+            expect(announced()).toEqual([])
+            expect(emission()).toMatchObject({committedEpoch: start + 1, committed: target, targetEpoch: start + 1})
+
+            const owed = emission().owed
+            await commit(start + 2, start + 3, 1_000)
+            await commit(start + 3, start + 4, 1_000)
+            expect(announced()).toEqual([])
+            expect(emission()).toMatchObject({owed, committedEpoch: start + 1, targetEpoch: start + 1})
+
+            await commit(start + 4, start + 5, 0)
+            expect(announced()).toEqual([{closed: start + 4, opened: start + 5, target: (X * 6) / 12}])
+            expectInvariants()
+        })
+
         test('announces partway up the ramp after an outage across SCRAP_START', async () => {
             const R = epochOn(NOW)
             const start = await ratify()
