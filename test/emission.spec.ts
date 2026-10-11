@@ -332,7 +332,7 @@ describe('emission', () => {
             expectInvariants()
         })
 
-        test.failing('announces no target for an epoch the game opens behind the wall clock', async () => {
+        test('announces no target for an epoch the game opens behind the wall clock', async () => {
             const start = await ratify()
             await walkTo(start)
             await close(start, start + 1, emission().target)

@@ -54,7 +54,7 @@ void token::commit(const uint32_t closed_epoch, const uint32_t opened_epoch, con
       logcommit.send(closed_epoch, asset{accepted, SCRAP_SYMBOL});
    }
 
-   if (opened_epoch > closed_epoch && opened_epoch > emission.target_epoch && opened_epoch <= now_epoch) {
+   if (opened_epoch > closed_epoch && opened_epoch > emission.target_epoch && opened_epoch == now_epoch) {
       emission.target_epoch = opened_epoch;
       emission.target       = asset{epoch_target(vote, opened_epoch, emission.owed.amount), SCRAP_SYMBOL};
 
