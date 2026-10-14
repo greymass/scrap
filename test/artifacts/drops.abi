@@ -1,0 +1,556 @@
+{
+    "____comment": "This file was generated with eosio-abigen. DO NOT EDIT ",
+    "version": "eosio::abi/1.2",
+    "types": [],
+    "structs": [
+        {
+            "name": "balances_row",
+            "base": "",
+            "fields": [
+                {
+                    "name": "owner",
+                    "type": "name"
+                },
+                {
+                    "name": "drops",
+                    "type": "int64"
+                },
+                {
+                    "name": "ram_bytes",
+                    "type": "int64"
+                }
+            ]
+        },
+        {
+            "name": "bind",
+            "base": "",
+            "fields": [
+                {
+                    "name": "owner",
+                    "type": "name"
+                },
+                {
+                    "name": "droplet_ids",
+                    "type": "uint64[]"
+                }
+            ]
+        },
+        {
+            "name": "bytescost",
+            "base": "",
+            "fields": [
+                {
+                    "name": "quantity",
+                    "type": "asset"
+                }
+            ]
+        },
+        {
+            "name": "claim",
+            "base": "",
+            "fields": [
+                {
+                    "name": "owner",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "destroy",
+            "base": "",
+            "fields": [
+                {
+                    "name": "owner",
+                    "type": "name"
+                },
+                {
+                    "name": "droplet_ids",
+                    "type": "uint64[]"
+                },
+                {
+                    "name": "memo",
+                    "type": "string?"
+                },
+                {
+                    "name": "to_notify",
+                    "type": "name?"
+                }
+            ]
+        },
+        {
+            "name": "destroy_return_value",
+            "base": "",
+            "fields": [
+                {
+                    "name": "unbound_destroyed",
+                    "type": "int64"
+                },
+                {
+                    "name": "bytes_reclaimed",
+                    "type": "int64"
+                }
+            ]
+        },
+        {
+            "name": "drop_row",
+            "base": "",
+            "fields": [
+                {
+                    "name": "seed",
+                    "type": "uint64"
+                },
+                {
+                    "name": "owner",
+                    "type": "name"
+                },
+                {
+                    "name": "created",
+                    "type": "block_timestamp_type"
+                },
+                {
+                    "name": "bound",
+                    "type": "bool"
+                }
+            ]
+        },
+        {
+            "name": "enable",
+            "base": "",
+            "fields": [
+                {
+                    "name": "enabled",
+                    "type": "bool"
+                }
+            ]
+        },
+        {
+            "name": "generate",
+            "base": "",
+            "fields": [
+                {
+                    "name": "owner",
+                    "type": "name"
+                },
+                {
+                    "name": "bound",
+                    "type": "bool"
+                },
+                {
+                    "name": "amount",
+                    "type": "uint32"
+                },
+                {
+                    "name": "data",
+                    "type": "string"
+                },
+                {
+                    "name": "to_notify",
+                    "type": "name?"
+                },
+                {
+                    "name": "memo",
+                    "type": "string?"
+                }
+            ]
+        },
+        {
+            "name": "generate_return_value",
+            "base": "",
+            "fields": [
+                {
+                    "name": "bytes_used",
+                    "type": "int64"
+                },
+                {
+                    "name": "bytes_balance",
+                    "type": "int64"
+                }
+            ]
+        },
+        {
+            "name": "lock",
+            "base": "",
+            "fields": [
+                {
+                    "name": "owner",
+                    "type": "name"
+                },
+                {
+                    "name": "droplet_ids",
+                    "type": "uint64[]"
+                }
+            ]
+        },
+        {
+            "name": "lock_row",
+            "base": "",
+            "fields": [
+                {
+                    "name": "seed",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "logdestroy",
+            "base": "",
+            "fields": [
+                {
+                    "name": "owner",
+                    "type": "name"
+                },
+                {
+                    "name": "drops",
+                    "type": "drop_row[]"
+                },
+                {
+                    "name": "destroyed",
+                    "type": "int64"
+                },
+                {
+                    "name": "unbound_destroyed",
+                    "type": "int64"
+                },
+                {
+                    "name": "bytes_reclaimed",
+                    "type": "int64"
+                },
+                {
+                    "name": "memo",
+                    "type": "string?"
+                },
+                {
+                    "name": "to_notify",
+                    "type": "name?"
+                }
+            ]
+        },
+        {
+            "name": "logdrops",
+            "base": "",
+            "fields": [
+                {
+                    "name": "owner",
+                    "type": "name"
+                },
+                {
+                    "name": "amount",
+                    "type": "int64"
+                },
+                {
+                    "name": "before_drops",
+                    "type": "int64"
+                },
+                {
+                    "name": "drops",
+                    "type": "int64"
+                }
+            ]
+        },
+        {
+            "name": "loggenerate",
+            "base": "",
+            "fields": [
+                {
+                    "name": "owner",
+                    "type": "name"
+                },
+                {
+                    "name": "drops",
+                    "type": "drop_row[]"
+                },
+                {
+                    "name": "generated",
+                    "type": "int64"
+                },
+                {
+                    "name": "bytes_used",
+                    "type": "int64"
+                },
+                {
+                    "name": "bytes_balance",
+                    "type": "int64"
+                },
+                {
+                    "name": "data",
+                    "type": "string"
+                },
+                {
+                    "name": "to_notify",
+                    "type": "name?"
+                },
+                {
+                    "name": "memo",
+                    "type": "string?"
+                }
+            ]
+        },
+        {
+            "name": "logrambytes",
+            "base": "",
+            "fields": [
+                {
+                    "name": "owner",
+                    "type": "name"
+                },
+                {
+                    "name": "bytes",
+                    "type": "int64"
+                },
+                {
+                    "name": "before_ram_bytes",
+                    "type": "int64"
+                },
+                {
+                    "name": "ram_bytes",
+                    "type": "int64"
+                }
+            ]
+        },
+        {
+            "name": "open",
+            "base": "",
+            "fields": [
+                {
+                    "name": "owner",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "ramcost",
+            "base": "",
+            "fields": [
+                {
+                    "name": "bytes",
+                    "type": "int64"
+                }
+            ]
+        },
+        {
+            "name": "state_row",
+            "base": "",
+            "fields": [
+                {
+                    "name": "genesis",
+                    "type": "block_timestamp_type"
+                },
+                {
+                    "name": "bytes_per_drop",
+                    "type": "int64"
+                },
+                {
+                    "name": "sequence",
+                    "type": "uint64"
+                },
+                {
+                    "name": "enabled",
+                    "type": "bool"
+                }
+            ]
+        },
+        {
+            "name": "transfer",
+            "base": "",
+            "fields": [
+                {
+                    "name": "from",
+                    "type": "name"
+                },
+                {
+                    "name": "to",
+                    "type": "name"
+                },
+                {
+                    "name": "droplet_ids",
+                    "type": "uint64[]"
+                },
+                {
+                    "name": "memo",
+                    "type": "string?"
+                }
+            ]
+        },
+        {
+            "name": "unbind",
+            "base": "",
+            "fields": [
+                {
+                    "name": "owner",
+                    "type": "name"
+                },
+                {
+                    "name": "droplet_ids",
+                    "type": "uint64[]"
+                }
+            ]
+        },
+        {
+            "name": "unlock",
+            "base": "",
+            "fields": [
+                {
+                    "name": "owner",
+                    "type": "name"
+                },
+                {
+                    "name": "droplet_ids",
+                    "type": "uint64[]"
+                }
+            ]
+        }
+    ],
+    "actions": [
+        {
+            "name": "bind",
+            "type": "bind",
+            "ricardian_contract": "---\n\nspec_version: \"0.2.0\"\ntitle: bind\nsummary: 'Bind Drop(s)'\nicon: https://avatars.githubusercontent.com/u/158113782#d3bf290fddeddbb7d32aa897e9f7e9e13a2ae44956142e23eb47b77096a2ea8d\n\n---\n\n{{owner}} agrees to bind {{droplet_ids}} drops(s)."
+        },
+        {
+            "name": "bytescost",
+            "type": "bytescost",
+            "ricardian_contract": "---\n\nspec_version: \"0.2.0\"\ntitle: bytescost\nsummary: bytescost\nicon: https://avatars.githubusercontent.com/u/158113782#d3bf290fddeddbb7d32aa897e9f7e9e13a2ae44956142e23eb47b77096a2ea8d\n\n---"
+        },
+        {
+            "name": "claim",
+            "type": "claim",
+            "ricardian_contract": "---\n\nspec_version: \"0.2.0\"\ntitle: claim\nsummary: 'Claim remaining RAM balance'\nicon: https://avatars.githubusercontent.com/u/158113782#d3bf290fddeddbb7d32aa897e9f7e9e13a2ae44956142e23eb47b77096a2ea8d\n\n---\n\nClaim any unclaimed RAM balance from the contract back to the {{owner}}'s account."
+        },
+        {
+            "name": "destroy",
+            "type": "destroy",
+            "ricardian_contract": "---\n\nspec_version: \"0.2.0\"\ntitle: destroy\nsummary: 'Destroy Drop(s)'\nicon: https://avatars.githubusercontent.com/u/158113782#d3bf290fddeddbb7d32aa897e9f7e9e13a2ae44956142e23eb47b77096a2ea8d\n\n---\n\n{{owner}} agrees to destroy {{droplet_ids}} drops(s).\n\n{{#if memo}}There is a memo attached to the transfer stating:\n{{memo}}\n{{/if}}\n\n{{#if_has_value to_notify}}There is a notification to be sent to {{to_notify}}.\n{{/if_has_value}}"
+        },
+        {
+            "name": "enable",
+            "type": "enable",
+            "ricardian_contract": "---\n\nspec_version: \"0.2.0\"\ntitle: enable\nsummary: 'Enable Drops contrat'\nicon: https://avatars.githubusercontent.com/u/158113782#d3bf290fddeddbb7d32aa897e9f7e9e13a2ae44956142e23eb47b77096a2ea8d\n\n---"
+        },
+        {
+            "name": "generate",
+            "type": "generate",
+            "ricardian_contract": "---\n\nspec_version: \"0.2.0\"\ntitle: generate\nsummary: 'Generate Drop(s)'\nicon: https://avatars.githubusercontent.com/u/158113782#d3bf290fddeddbb7d32aa897e9f7e9e13a2ae44956142e23eb47b77096a2ea8d\n\n---\n\n{{owner}} agrees to generate {{amount}} bound={{bound}} drops(s) using {{data}} data.\n\n{{#if_has_value to_notify}}There is a notification to be sent to {{to_notify}}.\n{{/if_has_value}}"
+        },
+        {
+            "name": "lock",
+            "type": "lock",
+            "ricardian_contract": "---\n\nspec_version: \"0.2.0\"\ntitle: lock\nsummary: 'Lock Drop(s)'\nicon: https://avatars.githubusercontent.com/u/158113782#d3bf290fddeddbb7d32aa897e9f7e9e13a2ae44956142e23eb47b77096a2ea8d\n\n---\n\n{{owner}} agrees to lock {{droplet_ids}} drops(s)."
+        },
+        {
+            "name": "logdestroy",
+            "type": "logdestroy",
+            "ricardian_contract": "---\n\nspec_version: \"0.2.0\"\ntitle: logdestroy\nsummary: logdestroy\nicon: https://avatars.githubusercontent.com/u/158113782#d3bf290fddeddbb7d32aa897e9f7e9e13a2ae44956142e23eb47b77096a2ea8d\n\n---"
+        },
+        {
+            "name": "logdrops",
+            "type": "logdrops",
+            "ricardian_contract": "---\n\nspec_version: \"0.2.0\"\ntitle: logdrops\nsummary: logdrops\nicon: https://avatars.githubusercontent.com/u/158113782#d3bf290fddeddbb7d32aa897e9f7e9e13a2ae44956142e23eb47b77096a2ea8d\n\n---"
+        },
+        {
+            "name": "loggenerate",
+            "type": "loggenerate",
+            "ricardian_contract": "---\n\nspec_version: \"0.2.0\"\ntitle: loggenerate\nsummary: loggenerate\nicon: https://avatars.githubusercontent.com/u/158113782#d3bf290fddeddbb7d32aa897e9f7e9e13a2ae44956142e23eb47b77096a2ea8d\n\n---"
+        },
+        {
+            "name": "logrambytes",
+            "type": "logrambytes",
+            "ricardian_contract": "---\n\nspec_version: \"0.2.0\"\ntitle: logrambytes\nsummary: logrambytes\nicon: https://avatars.githubusercontent.com/u/158113782#d3bf290fddeddbb7d32aa897e9f7e9e13a2ae44956142e23eb47b77096a2ea8d\n\n---"
+        },
+        {
+            "name": "open",
+            "type": "open",
+            "ricardian_contract": "---\n\nspec_version: \"0.2.0\"\ntitle: open\nsummary: 'Open account balance'\nicon: https://avatars.githubusercontent.com/u/158113782#d3bf290fddeddbb7d32aa897e9f7e9e13a2ae44956142e23eb47b77096a2ea8d\n\n---\n\nOpens RAM balance for {{owner}}."
+        },
+        {
+            "name": "ramcost",
+            "type": "ramcost",
+            "ricardian_contract": "---\n\nspec_version: \"0.2.0\"\ntitle: ramcost\nsummary: ramcost\nicon: https://avatars.githubusercontent.com/u/158113782#d3bf290fddeddbb7d32aa897e9f7e9e13a2ae44956142e23eb47b77096a2ea8d\n\n---"
+        },
+        {
+            "name": "transfer",
+            "type": "transfer",
+            "ricardian_contract": "---\n\nspec_version: \"0.2.0\"\ntitle: transfer\nsummary: 'Transfer Drop(s)'\nicon: https://avatars.githubusercontent.com/u/158113782#d3bf290fddeddbb7d32aa897e9f7e9e13a2ae44956142e23eb47b77096a2ea8d\n\n---\n\n{{from}} agrees to transfer {{droplet_ids}} drops(s) to {{to}}.\n\n{{#if memo}}There is a memo attached to the transfer stating:\n{{memo}}\n{{/if}}\n\nThere is a notification to be sent to {{to}}."
+        },
+        {
+            "name": "unbind",
+            "type": "unbind",
+            "ricardian_contract": "---\n\nspec_version: \"0.2.0\"\ntitle: unbind\nsummary: 'Unbind Drop(s)'\nicon: https://avatars.githubusercontent.com/u/158113782#d3bf290fddeddbb7d32aa897e9f7e9e13a2ae44956142e23eb47b77096a2ea8d\n\n---\n\n{{owner}} agrees to unbind {{droplet_ids}} drops(s)."
+        },
+        {
+            "name": "unlock",
+            "type": "unlock",
+            "ricardian_contract": "---\n\nspec_version: \"0.2.0\"\ntitle: unlock\nsummary: 'Unlock Drop(s)'\nicon: https://avatars.githubusercontent.com/u/158113782#d3bf290fddeddbb7d32aa897e9f7e9e13a2ae44956142e23eb47b77096a2ea8d\n\n---\n\n{{owner}} agrees to unlock {{droplet_ids}} drops(s)."
+        }
+    ],
+    "tables": [
+        {
+            "name": "balances",
+            "type": "balances_row",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": []
+        },
+        {
+            "name": "drop",
+            "type": "drop_row",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": []
+        },
+        {
+            "name": "lock",
+            "type": "lock_row",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": []
+        },
+        {
+            "name": "state",
+            "type": "state_row",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": []
+        }
+    ],
+    "ricardian_clauses": [
+        {
+            "id": "Drops",
+            "body": "Drops"
+        }
+    ],
+    "variants": [],
+    "action_results": [
+        {
+            "name": "bind",
+            "result_type": "int64"
+        },
+        {
+            "name": "bytescost",
+            "result_type": "int64"
+        },
+        {
+            "name": "claim",
+            "result_type": "int64"
+        },
+        {
+            "name": "destroy",
+            "result_type": "destroy_return_value"
+        },
+        {
+            "name": "generate",
+            "result_type": "generate_return_value"
+        },
+        {
+            "name": "open",
+            "result_type": "bool"
+        },
+        {
+            "name": "ramcost",
+            "result_type": "asset"
+        },
+        {
+            "name": "unbind",
+            "result_type": "int64"
+        }
+    ]
+}

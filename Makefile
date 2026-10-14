@@ -8,8 +8,7 @@ DEVNET_NODE_URL = https://jungle4.greymass.com
 DEVNET_ACCOUNT_NAME = scrap.gm
 CONTRACT_NAME = eosio.token
 
-build: | build/dir
-	cdt-cpp -abigen -abigen_output=build/${CONTRACT_NAME}.abi -o build/${CONTRACT_NAME}.wasm src/${CONTRACT_NAME}.cpp -R src -I include -D DEBUG
+build: build/production
 
 build/debug: | build/dir
 	cdt-cpp -abigen -abigen_output=build/${CONTRACT_NAME}.abi -o build/${CONTRACT_NAME}.wasm src/${CONTRACT_NAME}.cpp -R src -I include -D DEBUG
@@ -23,11 +22,11 @@ build/dir:
 clean:
 	rm -rf build
 
-devnet: build/debug
+devnet: build/production
 	cleos -u $(DEVNET_NODE_URL) set contract $(DEVNET_ACCOUNT_NAME) \
 		build/ ${CONTRACT_NAME}.wasm ${CONTRACT_NAME}.abi
 
-testnet: build/debug
+testnet: build/production
 	cleos -u $(TESTNET_NODE_URL) set contract $(TESTNET_ACCOUNT_NAME) \
 		build/ ${CONTRACT_NAME}.wasm ${CONTRACT_NAME}.abi
 
@@ -53,6 +52,17 @@ format: cppformat
 .PHONY: cppformat
 cppformat:
 	clang-format -i src/*.cpp include/${CONTRACT_NAME}/*.hpp
+
+.PHONY: test
+test: build/production node_modules test/artifacts/gamestub.wasm
+	bun test test/
+
+test/artifacts/gamestub.wasm: test/gamestub/gamestub.cpp
+	cdt-cpp -abigen -abigen_output=test/artifacts/gamestub.abi -o $@ $<
+
+node_modules: package.json
+	bun install
+	@touch node_modules
 
 .PHONY: distclean
 distclean: clean

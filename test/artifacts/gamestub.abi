@@ -1,0 +1,152 @@
+{
+    "____comment": "This file was generated with eosio-abigen. DO NOT EDIT ",
+    "version": "eosio::abi/1.2",
+    "types": [],
+    "structs": [
+        {
+            "name": "emitcfg_row",
+            "base": "",
+            "fields": [
+                {
+                    "name": "token_contract",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "game_row",
+            "base": "",
+            "fields": [
+                {
+                    "name": "contract",
+                    "type": "name"
+                },
+                {
+                    "name": "seed",
+                    "type": "checksum256"
+                },
+                {
+                    "name": "epochtime",
+                    "type": "uint32"
+                },
+                {
+                    "name": "start",
+                    "type": "time_point_sec"
+                },
+                {
+                    "name": "end",
+                    "type": "time_point_sec"
+                }
+            ]
+        },
+        {
+            "name": "sendcommit",
+            "base": "",
+            "fields": [
+                {
+                    "name": "token",
+                    "type": "name"
+                },
+                {
+                    "name": "closed",
+                    "type": "uint32"
+                },
+                {
+                    "name": "opened",
+                    "type": "uint32"
+                },
+                {
+                    "name": "amount",
+                    "type": "asset"
+                }
+            ]
+        },
+        {
+            "name": "sendmint",
+            "base": "",
+            "fields": [
+                {
+                    "name": "token",
+                    "type": "name"
+                },
+                {
+                    "name": "player",
+                    "type": "name"
+                },
+                {
+                    "name": "quantity",
+                    "type": "asset"
+                }
+            ]
+        },
+        {
+            "name": "setemitcfg",
+            "base": "",
+            "fields": [
+                {
+                    "name": "token_contract",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "setgame",
+            "base": "",
+            "fields": [
+                {
+                    "name": "contract",
+                    "type": "name"
+                },
+                {
+                    "name": "epochtime",
+                    "type": "uint32"
+                },
+                {
+                    "name": "start",
+                    "type": "time_point_sec"
+                }
+            ]
+        }
+    ],
+    "actions": [
+        {
+            "name": "sendcommit",
+            "type": "sendcommit",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "sendmint",
+            "type": "sendmint",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "setemitcfg",
+            "type": "setemitcfg",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "setgame",
+            "type": "setgame",
+            "ricardian_contract": ""
+        }
+    ],
+    "tables": [
+        {
+            "name": "emitcfg",
+            "type": "emitcfg_row",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": []
+        },
+        {
+            "name": "games",
+            "type": "game_row",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": []
+        }
+    ],
+    "ricardian_clauses": [],
+    "variants": [],
+    "action_results": []
+}

@@ -14,6 +14,34 @@
             ]
         },
         {
+            "name": "approval_row",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account",
+                    "type": "name"
+                },
+                {
+                    "name": "snapshot",
+                    "type": "asset"
+                },
+                {
+                    "name": "snapped",
+                    "type": "bool"
+                }
+            ]
+        },
+        {
+            "name": "approve",
+            "base": "",
+            "fields": [
+                {
+                    "name": "holder",
+                    "type": "name"
+                }
+            ]
+        },
+        {
             "name": "close",
             "base": "",
             "fields": [
@@ -24,6 +52,60 @@
                 {
                     "name": "symbol",
                     "type": "symbol"
+                }
+            ]
+        },
+        {
+            "name": "closevote",
+            "base": "",
+            "fields": [
+                {
+                    "name": "max_rows",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "commit",
+            "base": "",
+            "fields": [
+                {
+                    "name": "closed_epoch",
+                    "type": "uint32"
+                },
+                {
+                    "name": "opened_epoch",
+                    "type": "uint32"
+                },
+                {
+                    "name": "amount",
+                    "type": "asset"
+                }
+            ]
+        },
+        {
+            "name": "config_row",
+            "base": "",
+            "fields": [
+                {
+                    "name": "eon",
+                    "type": "name"
+                },
+                {
+                    "name": "nex",
+                    "type": "name"
+                },
+                {
+                    "name": "epoch_start",
+                    "type": "time_point_sec"
+                },
+                {
+                    "name": "epoch_seconds",
+                    "type": "uint32"
+                },
+                {
+                    "name": "notice_epochs",
+                    "type": "uint32"
                 }
             ]
         },
@@ -60,20 +142,88 @@
             ]
         },
         {
-            "name": "issue",
+            "name": "curve_band",
             "base": "",
             "fields": [
                 {
-                    "name": "to",
-                    "type": "name"
-                },
-                {
-                    "name": "quantity",
+                    "name": "below",
                     "type": "asset"
                 },
                 {
-                    "name": "memo",
-                    "type": "string"
+                    "name": "per_epoch",
+                    "type": "asset"
+                }
+            ]
+        },
+        {
+            "name": "curve_row",
+            "base": "",
+            "fields": [
+                {
+                    "name": "bands",
+                    "type": "curve_band[]"
+                },
+                {
+                    "name": "ramp_epochs",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "emission_row",
+            "base": "",
+            "fields": [
+                {
+                    "name": "owed",
+                    "type": "asset"
+                },
+                {
+                    "name": "committed_epoch",
+                    "type": "uint32"
+                },
+                {
+                    "name": "committed",
+                    "type": "asset"
+                },
+                {
+                    "name": "target_epoch",
+                    "type": "uint32"
+                },
+                {
+                    "name": "target",
+                    "type": "asset"
+                }
+            ]
+        },
+        {
+            "name": "init",
+            "base": "",
+            "fields": [
+                {
+                    "name": "eon",
+                    "type": "name"
+                },
+                {
+                    "name": "nex",
+                    "type": "name"
+                },
+                {
+                    "name": "notice_epochs",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "logcommit",
+            "base": "",
+            "fields": [
+                {
+                    "name": "closed_epoch",
+                    "type": "uint32"
+                },
+                {
+                    "name": "accepted",
+                    "type": "asset"
                 }
             ]
         },
@@ -104,6 +254,64 @@
             ]
         },
         {
+            "name": "logratify",
+            "base": "",
+            "fields": [
+                {
+                    "name": "tally",
+                    "type": "asset"
+                },
+                {
+                    "name": "supply",
+                    "type": "asset"
+                },
+                {
+                    "name": "ratified_epoch",
+                    "type": "uint32"
+                },
+                {
+                    "name": "start_epoch",
+                    "type": "uint32"
+                },
+                {
+                    "name": "start_time",
+                    "type": "time_point_sec"
+                }
+            ]
+        },
+        {
+            "name": "logsupport",
+            "base": "",
+            "fields": [
+                {
+                    "name": "supporters",
+                    "type": "support[]"
+                },
+                {
+                    "name": "closed",
+                    "type": "bool"
+                }
+            ]
+        },
+        {
+            "name": "logtarget",
+            "base": "",
+            "fields": [
+                {
+                    "name": "closed_epoch",
+                    "type": "uint32"
+                },
+                {
+                    "name": "opened_epoch",
+                    "type": "uint32"
+                },
+                {
+                    "name": "target",
+                    "type": "asset"
+                }
+            ]
+        },
+        {
             "name": "mint_result",
             "base": "",
             "fields": [
@@ -114,6 +322,20 @@
                 {
                     "name": "hash",
                     "type": "checksum256"
+                }
+            ]
+        },
+        {
+            "name": "mintshare",
+            "base": "",
+            "fields": [
+                {
+                    "name": "player",
+                    "type": "name"
+                },
+                {
+                    "name": "quantity",
+                    "type": "asset"
                 }
             ]
         },
@@ -136,16 +358,30 @@
             ]
         },
         {
-            "name": "retire",
+            "name": "setcurve",
             "base": "",
             "fields": [
                 {
-                    "name": "quantity",
-                    "type": "asset"
+                    "name": "bands",
+                    "type": "curve_band[]"
                 },
                 {
-                    "name": "memo",
-                    "type": "string"
+                    "name": "ramp_epochs",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "support",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account",
+                    "type": "name"
+                },
+                {
+                    "name": "weight",
+                    "type": "asset"
                 }
             ]
         },
@@ -170,13 +406,72 @@
                     "type": "string"
                 }
             ]
+        },
+        {
+            "name": "vote_row",
+            "base": "",
+            "fields": [
+                {
+                    "name": "tally",
+                    "type": "asset"
+                },
+                {
+                    "name": "ratified",
+                    "type": "bool"
+                },
+                {
+                    "name": "closed",
+                    "type": "bool"
+                },
+                {
+                    "name": "supply",
+                    "type": "asset"
+                },
+                {
+                    "name": "ratified_epoch",
+                    "type": "uint32"
+                },
+                {
+                    "name": "start_epoch",
+                    "type": "uint32"
+                },
+                {
+                    "name": "start_time",
+                    "type": "time_point_sec"
+                }
+            ]
+        },
+        {
+            "name": "withdraw",
+            "base": "",
+            "fields": [
+                {
+                    "name": "holder",
+                    "type": "name"
+                }
+            ]
         }
     ],
     "actions": [
         {
+            "name": "approve",
+            "type": "approve",
+            "ricardian_contract": ""
+        },
+        {
             "name": "close",
             "type": "close",
             "ricardian_contract": "---\nspec_version: \"0.2.0\"\ntitle: Close Token Balance\nsummary: 'Close {{nowrap owner}}’s zero quantity balance'\nicon: @ICON_BASE_URL@/@TOKEN_ICON_URI@\n---\n\n{{owner}} agrees to close their zero quantity balance for the {{symbol_to_symbol_code symbol}} token.\n\nRAM will be refunded to the RAM payer of the {{symbol_to_symbol_code symbol}} token balance for {{owner}}."
+        },
+        {
+            "name": "closevote",
+            "type": "closevote",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "commit",
+            "type": "commit",
+            "ricardian_contract": ""
         },
         {
             "name": "create",
@@ -184,9 +479,14 @@
             "ricardian_contract": "---\nspec_version: \"0.2.0\"\ntitle: Create New Token\nsummary: 'Create a new token'\nicon: @ICON_BASE_URL@/@TOKEN_ICON_URI@\n---\n\n{{$action.account}} agrees to create a new token with symbol {{asset_to_symbol_code maximum_supply}} to be managed by {{issuer}}.\n\nThis action will not result any any tokens being issued into circulation.\n\n{{issuer}} will be allowed to issue tokens into circulation, up to a maximum supply of {{maximum_supply}}.\n\nRAM will deducted from {{$action.account}}’s resources to create the necessary records."
         },
         {
-            "name": "issue",
-            "type": "issue",
-            "ricardian_contract": "---\nspec_version: \"0.2.0\"\ntitle: Issue Tokens into Circulation\nsummary: 'Issue {{nowrap quantity}} into circulation and transfer into {{nowrap to}}’s account'\nicon: @ICON_BASE_URL@/@TOKEN_ICON_URI@\n---\n\nThe token manager agrees to issue {{quantity}} into circulation, and transfer it into {{to}}’s account.\n\n{{#if memo}}There is a memo attached to the transfer stating:\n{{memo}}\n{{/if}}\n\nIf {{to}} does not have a balance for {{asset_to_symbol_code quantity}}, or the token manager does not have a balance for {{asset_to_symbol_code quantity}}, the token manager will be designated as the RAM payer of the {{asset_to_symbol_code quantity}} token balance for {{to}}. As a result, RAM will be deducted from the token manager’s resources to create the necessary records.\n\nThis action does not allow the total quantity to exceed the max allowed supply of the token."
+            "name": "init",
+            "type": "init",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "logcommit",
+            "type": "logcommit",
+            "ricardian_contract": ""
         },
         {
             "name": "logmint",
@@ -194,19 +494,44 @@
             "ricardian_contract": "---\nspec_version: \"0.2.0\"\ntitle: logmint\nsummary: logmint\nicon: @ICON_BASE_URL@/@TRANSFER_ICON_URI@\n---"
         },
         {
+            "name": "logratify",
+            "type": "logratify",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "logsupport",
+            "type": "logsupport",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "logtarget",
+            "type": "logtarget",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "mintshare",
+            "type": "mintshare",
+            "ricardian_contract": ""
+        },
+        {
             "name": "open",
             "type": "open",
             "ricardian_contract": "---\nspec_version: \"0.2.0\"\ntitle: Open Token Balance\nsummary: 'Open a zero quantity balance for {{nowrap owner}}'\nicon: @ICON_BASE_URL@/@TOKEN_ICON_URI@\n---\n\n{{ram_payer}} agrees to establish a zero quantity balance for {{owner}} for the {{symbol_to_symbol_code symbol}} token.\n\nIf {{owner}} does not have a balance for {{symbol_to_symbol_code symbol}}, {{ram_payer}} will be designated as the RAM payer of the {{symbol_to_symbol_code symbol}} token balance for {{owner}}. As a result, RAM will be deducted from {{ram_payer}}’s resources to create the necessary records."
         },
         {
-            "name": "retire",
-            "type": "retire",
-            "ricardian_contract": "---\nspec_version: \"0.2.0\"\ntitle: Remove Tokens from Circulation\nsummary: 'Remove {{nowrap quantity}} from circulation'\nicon: @ICON_BASE_URL@/@TOKEN_ICON_URI@\n---\n\nThe token manager agrees to remove {{quantity}} from circulation, taken from their own account.\n\n{{#if memo}} There is a memo attached to the action stating:\n{{memo}}\n{{/if}}"
+            "name": "setcurve",
+            "type": "setcurve",
+            "ricardian_contract": ""
         },
         {
             "name": "transfer",
             "type": "transfer",
             "ricardian_contract": "---\nspec_version: \"0.2.0\"\ntitle: Transfer Tokens\nsummary: 'Send {{nowrap quantity}} from {{nowrap from}} to {{nowrap to}}'\nicon: @ICON_BASE_URL@/@TRANSFER_ICON_URI@\n---\n\n{{from}} agrees to send {{quantity}} to {{to}}.\n\n{{#if memo}}There is a memo attached to the transfer stating:\n{{memo}}\n{{/if}}\n\nIf {{from}} is not already the RAM payer of their {{asset_to_symbol_code quantity}} token balance, {{from}} will be designated as such. As a result, RAM will be deducted from {{from}}’s resources to refund the original RAM payer.\n\nIf {{to}} does not have a balance for {{asset_to_symbol_code quantity}}, {{from}} will be designated as the RAM payer of the {{asset_to_symbol_code quantity}} token balance for {{to}}. As a result, RAM will be deducted from {{from}}’s resources to create the necessary records."
+        },
+        {
+            "name": "withdraw",
+            "type": "withdraw",
+            "ricardian_contract": ""
         }
     ],
     "tables": [
@@ -218,8 +543,43 @@
             "key_types": []
         },
         {
+            "name": "approvals",
+            "type": "approval_row",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": []
+        },
+        {
+            "name": "config",
+            "type": "config_row",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": []
+        },
+        {
+            "name": "curve",
+            "type": "curve_row",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": []
+        },
+        {
+            "name": "emission",
+            "type": "emission_row",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": []
+        },
+        {
             "name": "stat",
             "type": "currency_stats",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": []
+        },
+        {
+            "name": "vote",
+            "type": "vote_row",
             "index_type": "i64",
             "key_names": [],
             "key_types": []

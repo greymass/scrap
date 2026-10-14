@@ -7,6 +7,7 @@ void token::create(const name& issuer, const asset& maximum_supply)
    require_auth(get_self());
 
    auto sym = maximum_supply.symbol;
+   check(sym == SCRAP_SYMBOL, "only SCRAP is supported");
    check(maximum_supply.is_valid(), "invalid supply");
    check(maximum_supply.amount > 0, "max-supply must be positive");
 
@@ -52,6 +53,10 @@ void token::destroy(const name& issuer, const asset& maximum_supply)
                                                            optional<string>                           memo,
                                                            optional<name>                             to_notify)
 {
+   if (handover_started()) {
+      return;
+   }
+
    const dropssystem::epoch::epoch_table _epoch("epoch.drops"_n, "epoch.drops"_n.value);
    dropssystem::epoch::state_table       _state("epoch.drops"_n, "epoch.drops"_n.value);
 
@@ -122,10 +127,12 @@ void token::destroy(const name& issuer, const asset& maximum_supply)
    asset quantity = asset(amount, SCRAP_SYMBOL);
    statstable.modify(st, get_self(), [&](auto& s) { s.supply += quantity; });
 
-   add_balance(owner, quantity, get_self());
+   const int64_t before = add_balance(owner, quantity, get_self());
 
    token::logmint_action logmint{get_self(), {get_self(), "active"_n}};
    logmint.send(owner, quantity, epoch_previous, epoch->seed, results);
+
+   track_vote({{owner, before, before + quantity.amount}}, true);
 }
 
 uint64_t token::get_mint_amount(const uint64_t current_supply)
@@ -168,10 +175,11 @@ uint64_t token::get_mint_amount(const uint64_t current_supply)
    }
 }
 
+#ifdef DEBUG
 void token::issue(const name& to, const asset& quantity, const string& memo)
 {
    auto sym = quantity.symbol;
-   check(sym.is_valid(), "invalid symbol name");
+   check(sym == SCRAP_SYMBOL, "only SCRAP is supported");
    check(memo.size() <= 256, "memo has more than 256 bytes");
 
    stats statstable(get_self(), sym.code().raw());
@@ -185,17 +193,19 @@ void token::issue(const name& to, const asset& quantity, const string& memo)
    check(quantity.amount > 0, "must issue positive quantity");
 
    check(quantity.symbol == st.supply.symbol, "symbol precision mismatch");
-   check(quantity.amount <= st.max_supply.amount - st.supply.amount, "quantity exceeds available supply");
+   check(quantity.amount <= st.max_supply.amount - st.supply.amount - owed_amount(),
+         "quantity exceeds available supply");
 
    statstable.modify(st, same_payer, [&](auto& s) { s.supply += quantity; });
 
-   add_balance(st.issuer, quantity, st.issuer);
+   const int64_t before = add_balance(st.issuer, quantity, st.issuer);
+   track_vote({{st.issuer, before, before + quantity.amount}}, true);
 }
 
 void token::retire(const asset& quantity, const string& memo)
 {
    auto sym = quantity.symbol;
-   check(sym.is_valid(), "invalid symbol name");
+   check(sym == SCRAP_SYMBOL, "only SCRAP is supported");
    check(memo.size() <= 256, "memo has more than 256 bytes");
 
    stats statstable(get_self(), sym.code().raw());
@@ -211,14 +221,17 @@ void token::retire(const asset& quantity, const string& memo)
 
    statstable.modify(st, same_payer, [&](auto& s) { s.supply -= quantity; });
 
-   sub_balance(st.issuer, quantity);
+   const int64_t before = sub_balance(st.issuer, quantity);
+   track_vote({{st.issuer, before, before - quantity.amount}}, true);
 }
+#endif
 
 void token::transfer(const name& from, const name& to, const asset& quantity, const string& memo)
 {
    check(from != to, "cannot transfer to self");
    require_auth(from);
    check(is_account(to), "to account does not exist");
+   check(quantity.symbol == SCRAP_SYMBOL, "only SCRAP is supported");
    auto        sym = quantity.symbol.code();
    stats       statstable(get_self(), sym.raw());
    const auto& st = statstable.get(sym.raw());
@@ -233,29 +246,35 @@ void token::transfer(const name& from, const name& to, const asset& quantity, co
 
    auto payer = has_auth(to) ? to : from;
 
-   sub_balance(from, quantity);
-   add_balance(to, quantity, payer);
+   const int64_t from_before = sub_balance(from, quantity);
+   const int64_t to_before   = add_balance(to, quantity, payer);
+   track_vote({{from, from_before, from_before - quantity.amount}, {to, to_before, to_before + quantity.amount}},
+              false);
 }
 
-void token::sub_balance(const name& owner, const asset& value)
+int64_t token::sub_balance(const name& owner, const asset& value)
 {
    accounts from_acnts(get_self(), owner.value);
 
    const auto& from = from_acnts.get(value.symbol.code().raw(), "no balance object found");
    check(from.balance.amount >= value.amount, "overdrawn balance");
 
+   const int64_t before = from.balance.amount;
    from_acnts.modify(from, owner, [&](auto& a) { a.balance -= value; });
+   return before;
 }
 
-void token::add_balance(const name& owner, const asset& value, const name& ram_payer)
+int64_t token::add_balance(const name& owner, const asset& value, const name& ram_payer)
 {
    accounts to_acnts(get_self(), owner.value);
    auto     to = to_acnts.find(value.symbol.code().raw());
    if (to == to_acnts.end()) {
       to_acnts.emplace(ram_payer, [&](auto& a) { a.balance = value; });
-   } else {
-      to_acnts.modify(to, same_payer, [&](auto& a) { a.balance += value; });
+      return 0;
    }
+   const int64_t before = to->balance.amount;
+   to_acnts.modify(to, same_payer, [&](auto& a) { a.balance += value; });
+   return before;
 }
 
 void token::open(const name& owner, const symbol& symbol, const name& ram_payer)
@@ -263,6 +282,7 @@ void token::open(const name& owner, const symbol& symbol, const name& ram_payer)
    require_auth(ram_payer);
 
    check(is_account(owner), "owner account does not exist");
+   check(symbol == SCRAP_SYMBOL, "only SCRAP is supported");
 
    auto        sym_code_raw = symbol.code().raw();
    stats       statstable(get_self(), sym_code_raw);
@@ -287,3 +307,6 @@ void token::close(const name& owner, const symbol& symbol)
 }
 
 } // namespace eosio
+
+#include "emission.cpp"
+#include "vote.cpp"

@@ -1,0 +1,385 @@
+{
+    "____comment": "This file was generated with eosio-abigen. DO NOT EDIT ",
+    "version": "eosio::abi/1.2",
+    "types": [],
+    "structs": [
+        {
+            "name": "addoracle",
+            "base": "",
+            "fields": [
+                {
+                    "name": "oracle",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "advance",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "commit",
+            "base": "",
+            "fields": [
+                {
+                    "name": "oracle",
+                    "type": "name"
+                },
+                {
+                    "name": "epoch",
+                    "type": "uint64"
+                },
+                {
+                    "name": "commit",
+                    "type": "checksum256"
+                }
+            ]
+        },
+        {
+            "name": "commit_row",
+            "base": "",
+            "fields": [
+                {
+                    "name": "id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "epoch",
+                    "type": "uint64"
+                },
+                {
+                    "name": "oracle",
+                    "type": "name"
+                },
+                {
+                    "name": "commit",
+                    "type": "checksum256"
+                }
+            ]
+        },
+        {
+            "name": "computehash",
+            "base": "",
+            "fields": [
+                {
+                    "name": "epoch",
+                    "type": "uint64"
+                },
+                {
+                    "name": "reveals",
+                    "type": "string[]"
+                }
+            ]
+        },
+        {
+            "name": "duration",
+            "base": "",
+            "fields": [
+                {
+                    "name": "duration",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "enable",
+            "base": "",
+            "fields": [
+                {
+                    "name": "enabled",
+                    "type": "bool"
+                }
+            ]
+        },
+        {
+            "name": "epoch_info",
+            "base": "",
+            "fields": [
+                {
+                    "name": "epoch",
+                    "type": "uint64"
+                },
+                {
+                    "name": "start",
+                    "type": "block_timestamp_type"
+                },
+                {
+                    "name": "end",
+                    "type": "block_timestamp_type"
+                },
+                {
+                    "name": "seed",
+                    "type": "checksum256"
+                },
+                {
+                    "name": "oracles",
+                    "type": "name[]"
+                }
+            ]
+        },
+        {
+            "name": "epoch_row",
+            "base": "",
+            "fields": [
+                {
+                    "name": "epoch",
+                    "type": "uint64"
+                },
+                {
+                    "name": "oracles",
+                    "type": "name[]"
+                },
+                {
+                    "name": "seed",
+                    "type": "checksum256"
+                }
+            ]
+        },
+        {
+            "name": "forcereveal",
+            "base": "",
+            "fields": [
+                {
+                    "name": "epoch",
+                    "type": "uint64"
+                },
+                {
+                    "name": "salt",
+                    "type": "string"
+                }
+            ]
+        },
+        {
+            "name": "getepoch",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "getepochinfo",
+            "base": "",
+            "fields": [
+                {
+                    "name": "epoch",
+                    "type": "uint64?"
+                }
+            ]
+        },
+        {
+            "name": "getoracles",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "init",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "oracle_row",
+            "base": "",
+            "fields": [
+                {
+                    "name": "oracle",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "removeoracle",
+            "base": "",
+            "fields": [
+                {
+                    "name": "oracle",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "reveal",
+            "base": "",
+            "fields": [
+                {
+                    "name": "oracle",
+                    "type": "name"
+                },
+                {
+                    "name": "epoch",
+                    "type": "uint64"
+                },
+                {
+                    "name": "reveal",
+                    "type": "string"
+                }
+            ]
+        },
+        {
+            "name": "reveal_row",
+            "base": "",
+            "fields": [
+                {
+                    "name": "id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "epoch",
+                    "type": "uint64"
+                },
+                {
+                    "name": "oracle",
+                    "type": "name"
+                },
+                {
+                    "name": "reveal",
+                    "type": "string"
+                }
+            ]
+        },
+        {
+            "name": "state_row",
+            "base": "",
+            "fields": [
+                {
+                    "name": "genesis",
+                    "type": "block_timestamp_type"
+                },
+                {
+                    "name": "duration",
+                    "type": "uint32"
+                },
+                {
+                    "name": "enabled",
+                    "type": "bool"
+                }
+            ]
+        }
+    ],
+    "actions": [
+        {
+            "name": "addoracle",
+            "type": "addoracle",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "advance",
+            "type": "advance",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "commit",
+            "type": "commit",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "computehash",
+            "type": "computehash",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "duration",
+            "type": "duration",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "enable",
+            "type": "enable",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "forcereveal",
+            "type": "forcereveal",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "getepoch",
+            "type": "getepoch",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "getepochinfo",
+            "type": "getepochinfo",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "getoracles",
+            "type": "getoracles",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "init",
+            "type": "init",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "removeoracle",
+            "type": "removeoracle",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "reveal",
+            "type": "reveal",
+            "ricardian_contract": ""
+        }
+    ],
+    "tables": [
+        {
+            "name": "commit",
+            "type": "commit_row",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": []
+        },
+        {
+            "name": "epoch",
+            "type": "epoch_row",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": []
+        },
+        {
+            "name": "oracle",
+            "type": "oracle_row",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": []
+        },
+        {
+            "name": "reveal",
+            "type": "reveal_row",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": []
+        },
+        {
+            "name": "state",
+            "type": "state_row",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": []
+        }
+    ],
+    "ricardian_clauses": [],
+    "variants": [],
+    "action_results": [
+        {
+            "name": "advance",
+            "result_type": "epoch_row"
+        },
+        {
+            "name": "computehash",
+            "result_type": "checksum256"
+        },
+        {
+            "name": "getepoch",
+            "result_type": "uint64"
+        },
+        {
+            "name": "getepochinfo",
+            "result_type": "epoch_info"
+        },
+        {
+            "name": "getoracles",
+            "result_type": "name[]"
+        }
+    ]
+}

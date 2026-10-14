@@ -1,0 +1,11 @@
+{
+    "type": "module",
+    "scripts": {
+        "test": "make test"
+    },
+    "devDependencies": {
+        "@greymass/vert": "^3.0.0",
+        "@types/bun": "^1.0.4",
+        "@wharfkit/antelope": "^1.2.0"
+    }
+}

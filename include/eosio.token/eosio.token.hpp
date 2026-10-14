@@ -2,8 +2,10 @@
 
 #include <eosio/asset.hpp>
 #include <eosio/eosio.hpp>
+#include <eosio/singleton.hpp>
 #include <epoch.drops/epoch.drops.hpp>
 
+#include <initializer_list>
 #include <string>
 
 namespace eosiosystem {
@@ -99,6 +101,7 @@ public:
                                   const checksum256         hash,
                                   const vector<mint_result> results);
 
+#ifdef DEBUG
    /**
     *  This action issues to `to` account a `quantity` of tokens.
     *
@@ -116,6 +119,7 @@ public:
     * @param memo - the memo string to accompany the transaction.
     */
    [[eosio::action]] void retire(const asset& quantity, const string& memo);
+#endif
 
    /**
     * Allows `from` account to transfer to `to` account the `quantity` tokens.
@@ -152,6 +156,44 @@ public:
     */
    [[eosio::action]] void close(const name& owner, const symbol& symbol);
 
+   struct support
+   {
+      name  account;
+      asset weight;
+   };
+
+   [[eosio::action]] void init(const name eon, const name nex, const uint32_t notice_epochs);
+
+   [[eosio::action]] void approve(const name holder);
+
+   [[eosio::action]] void withdraw(const name holder);
+
+   [[eosio::action]] void closevote(const uint32_t max_rows);
+
+   [[eosio::action]] void logratify(const asset          tally,
+                                    const asset          supply,
+                                    const uint32_t       ratified_epoch,
+                                    const uint32_t       start_epoch,
+                                    const time_point_sec start_time);
+
+   [[eosio::action]] void logsupport(const vector<support> supporters, const bool closed);
+
+   struct curve_band
+   {
+      asset below;
+      asset per_epoch;
+   };
+
+   [[eosio::action]] void setcurve(const vector<curve_band> bands, const uint32_t ramp_epochs);
+
+   [[eosio::action]] void commit(const uint32_t closed_epoch, const uint32_t opened_epoch, const asset amount);
+
+   [[eosio::action]] void logtarget(const uint32_t closed_epoch, const uint32_t opened_epoch, const asset target);
+
+   [[eosio::action]] void logcommit(const uint32_t closed_epoch, const asset accepted);
+
+   [[eosio::action]] void mintshare(const name player, const asset quantity);
+
 #ifdef DEBUG
    /**
     * FOR DEBUGGING: This action will destroy all balances and reset the contract.
@@ -173,13 +215,27 @@ public:
       return ac.balance;
    }
 
-   using create_action   = eosio::action_wrapper<"create"_n, &token::create>;
-   using issue_action    = eosio::action_wrapper<"issue"_n, &token::issue>;
-   using retire_action   = eosio::action_wrapper<"retire"_n, &token::retire>;
+   using create_action = eosio::action_wrapper<"create"_n, &token::create>;
+#ifdef DEBUG
+   using issue_action  = eosio::action_wrapper<"issue"_n, &token::issue>;
+   using retire_action = eosio::action_wrapper<"retire"_n, &token::retire>;
+#endif
    using transfer_action = eosio::action_wrapper<"transfer"_n, &token::transfer>;
    using open_action     = eosio::action_wrapper<"open"_n, &token::open>;
    using close_action    = eosio::action_wrapper<"close"_n, &token::close>;
    using logmint_action  = eosio::action_wrapper<"logmint"_n, &token::logmint>;
+
+   using init_action       = eosio::action_wrapper<"init"_n, &token::init>;
+   using approve_action    = eosio::action_wrapper<"approve"_n, &token::approve>;
+   using withdraw_action   = eosio::action_wrapper<"withdraw"_n, &token::withdraw>;
+   using closevote_action  = eosio::action_wrapper<"closevote"_n, &token::closevote>;
+   using logratify_action  = eosio::action_wrapper<"logratify"_n, &token::logratify>;
+   using logsupport_action = eosio::action_wrapper<"logsupport"_n, &token::logsupport>;
+   using setcurve_action   = eosio::action_wrapper<"setcurve"_n, &token::setcurve>;
+   using commit_action     = eosio::action_wrapper<"commit"_n, &token::commit>;
+   using logtarget_action  = eosio::action_wrapper<"logtarget"_n, &token::logtarget>;
+   using logcommit_action  = eosio::action_wrapper<"logcommit"_n, &token::logcommit>;
+   using mintshare_action  = eosio::action_wrapper<"mintshare"_n, &token::mintshare>;
 
 private:
    struct [[eosio::table]] account
@@ -201,9 +257,78 @@ private:
    typedef eosio::multi_index<"accounts"_n, account>    accounts;
    typedef eosio::multi_index<"stat"_n, currency_stats> stats;
 
-   void     sub_balance(const name& owner, const asset& value);
-   void     add_balance(const name& owner, const asset& value, const name& ram_payer);
+   struct [[eosio::table("config")]] config_row
+   {
+      name           eon;
+      name           nex;
+      time_point_sec epoch_start;
+      uint32_t       epoch_seconds = 0;
+      uint32_t       notice_epochs = 0;
+   };
+
+   struct [[eosio::table("vote")]] vote_row
+   {
+      asset          tally;
+      bool           ratified = false;
+      bool           closed   = false;
+      asset          supply;
+      uint32_t       ratified_epoch = 0;
+      uint32_t       start_epoch    = 0;
+      time_point_sec start_time;
+   };
+
+   struct [[eosio::table("approvals")]] approval_row
+   {
+      name  account;
+      asset snapshot;
+      bool  snapped = false;
+
+      uint64_t primary_key() const { return account.value; }
+   };
+
+   struct [[eosio::table("curve")]] curve_row
+   {
+      vector<curve_band> bands;
+      uint32_t           ramp_epochs = 0;
+   };
+
+   struct [[eosio::table("emission")]] emission_row
+   {
+      asset    owed;
+      uint32_t committed_epoch = 0;
+      asset    committed;
+      uint32_t target_epoch = 0;
+      asset    target;
+   };
+
+   typedef eosio::singleton<"config"_n, config_row>        config_table;
+   typedef eosio::singleton<"vote"_n, vote_row>            vote_table;
+   typedef eosio::multi_index<"approvals"_n, approval_row> approvals_table;
+   typedef eosio::singleton<"curve"_n, curve_row>          curve_table;
+   typedef eosio::singleton<"emission"_n, emission_row>    emission_table;
+
+   struct balance_change
+   {
+      name    owner;
+      int64_t before;
+      int64_t after;
+   };
+
+   int64_t  sub_balance(const name& owner, const asset& value);
+   int64_t  add_balance(const name& owner, const asset& value, const name& ram_payer);
    uint64_t get_mint_amount(const uint64_t current_supply);
+
+   int64_t  balance_of(const name& owner);
+   uint32_t current_epoch(const config_row& config);
+   bool     handover_started();
+   bool     eon_names_self(const name& eon);
+   bool     game_clock(const name& nex, const name& eon, time_point_sec& start, uint32_t& seconds);
+   bool     try_ratify(vote_row& vote);
+   void     track_vote(std::initializer_list<balance_change> changes, const bool supply_changed);
+
+   void    check_curve(const vector<curve_band>& bands, const uint32_t ramp_epochs);
+   int64_t owed_amount();
+   int64_t epoch_target(const vote_row& vote, const uint32_t epoch, const int64_t owed);
 };
 
 } // namespace eosio
